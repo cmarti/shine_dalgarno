@@ -1,0 +1,18 @@
+PAPER
+- Supplementary figures
+    - Scanning selection strenght in dmsC. Figure with relaxation times and another with the visualizations
+    - Axis 3 (4) in dmsC visualization
+    - Probability vs frequency scatterplot
+    - Relaxation times in dmsC and TD model
+    - Scatterplot of predictions in TD model (or all models) in traning and test data
+
+CODE
+- Organize SD repository
+- Test gpmap-tools installation works
+- Release gpmap-tools new version on pypi
+- Review docs
+    - Make sure we have predictions and contrasts in both VCregression and SeqDEFT
+    - Think whether to include a section on SD
+
+ADDITIONAL STUFF
+- Plot errors of the TD model on the visualization directly
