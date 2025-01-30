@@ -64,15 +64,9 @@ if __name__ == '__main__':
     seq_length = 9
     sd_start = 7
 
-    # genome_fpath = join('genome', 'GCF_000005845.2_ASM584v2_genomic.fna')
-    # gff_fpath = join('genome', 'GCF_000005845.2_ASM584v2_genomic.gff')
-    # annotation = read_gff(gff_fpath)
-    
-    genome_fpath = join('genome', 'Escherichia_coli_gca_001263735.ASM126373v1.dna.toplevel.fa')
-    gtf_fpath  = join('genome', 'Escherichia_coli_gca_001263735.ASM126373v1.51.gtf')
+    genome_fpath = join('data', 'Escherichia_coli_gca_001263735.ASM126373v1.dna.toplevel.fa')
+    gtf_fpath  = join('data', 'Escherichia_coli_gca_001263735.ASM126373v1.51.gtf')
     annotation = read_gtf(gtf_fpath)
-    # print(len(list(read_gtf(gtf_fpath))))
-    # exit()
 
     genome = Fastafile(genome_fpath)
     gene_SD = get_SD_seqs(annotation, genome, seq_length=seq_length, 
@@ -80,6 +74,6 @@ if __name__ == '__main__':
     gene_SD = pd.DataFrame(gene_SD)
     gene_SD.to_csv('data/gene_data.csv')
 
-    with open('data/SD_seqs.txt', 'w') as fhand:
+    with open('processed/SD_seqs.txt', 'w') as fhand:
         for seq in gene_SD['SD']:
             fhand.write('{}\n'.format(seq))

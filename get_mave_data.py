@@ -25,8 +25,8 @@ if __name__ == "__main__":
     train = data.loc[u < 0.999, :]
     test = data.loc[u > 0.999, :]
 
-    train.to_csv("data/dmsc.train.csv")
-    test.to_csv("data/dmsc.test.csv")
+    train.to_csv("processed/dmsc.train.csv")
+    test.to_csv("processed/dmsc.test.csv")
 
     print(
         "Split into {} sequences for training and {} for testing".format(
