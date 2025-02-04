@@ -31,8 +31,9 @@ if __name__ == '__main__':
     max_logL = logL_df.groupby('log_a')['logL'].mean().max()
 
     fig = plt.figure(figsize=(FIG_WIDTH * 0.5, FIG_WIDTH * 0.35))
-    gs = gs.GridSpec(4 + n_hist, 2,
-                     height_ratios=[0.75] + [3/n_hist] * (n_hist + 3),
+    nspace = 4
+    gs = gs.GridSpec(1 + nspace + n_hist, 2,
+                     height_ratios=[0.75] + [3/n_hist] * (n_hist + nspace),
                      width_ratios=[1, 1])
     
     print('Plotting sequence logo')
@@ -48,9 +49,10 @@ if __name__ == '__main__':
             xlabel='Position relative to start codon',
             xticks=xticks, xticklabels=xticklabels,
             yticks=[0, 0.5, 1])
+    axes.text(0.05, 0.95, 'A', fontsize=10, weight='bold', transform=fig.transFigure)
     
     print('Plotting CV curve')
-    axes = fig.add_subplot(gs[4:, 0])
+    axes = fig.add_subplot(gs[nspace+1:, 0])
     plot_hyperparam_cv(logL_df, axes, show_folds=False, size=2)
     axes.axhline(max_logL, lw=0.5, linestyle='--', color='red')
     axes.set(xticks=np.arange(1, 7))
@@ -58,11 +60,12 @@ if __name__ == '__main__':
     frame = legend.get_frame()
     frame.set_linewidth(0.5)
     frame.set_alpha(0.5)
+    axes.text(0.05, 0.65, 'B', fontsize=10, weight='bold', transform=fig.transFigure)
 
     print('Plotting histograms')
 
     bins = np.linspace(inferred["logQ"].min(), inferred["logQ"].max(), 50)
-    subplots = [fig.add_subplot(gs[4 + i, 1]) for i in range(n_hist)]
+    subplots = [fig.add_subplot(gs[nspace + 1 + i, 1]) for i in range(n_hist)]
     xticks = np.arange(-8, -2)
     for axes, (c, df) in zip(subplots, inferred.groupby("counts")):
 
@@ -117,6 +120,7 @@ if __name__ == '__main__':
                      fontsize=7, rotation=90,
                      ha='center', va='center',
                      transform=axes.transAxes)
+    subplots[0].text(0.565, 0.65, 'C', fontsize=10, weight='bold', transform=fig.transFigure)
 
-    fig.subplots_adjust(bottom=0.2, left=0.2, hspace=0.15, wspace=0.25, top=0.95, right=0.95)
+    fig.subplots_adjust(bottom=0.175, left=0.2, hspace=0.15, wspace=0.25, top=0.925, right=0.95)
     fig.savefig('figures/figure1.png', dpi=300)

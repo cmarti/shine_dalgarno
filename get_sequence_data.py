@@ -72,7 +72,7 @@ if __name__ == '__main__':
     gene_SD = get_SD_seqs(annotation, genome, seq_length=seq_length, 
                           upstream_bases=upstream_bases, sd_start=sd_start)
     gene_SD = pd.DataFrame(gene_SD)
-    gene_SD.to_csv('data/gene_data.csv')
+    gene_SD.to_csv('processed/gene_data.csv')
 
     with open('processed/SD_seqs.txt', 'w') as fhand:
         for seq in gene_SD['SD']:

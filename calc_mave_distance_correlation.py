@@ -5,18 +5,11 @@ from gpmap.src.inference import VCregression
 
 
 if __name__ == "__main__":
-    train = pd.read_csv("data/dmsc.train.csv", index_col=0)
-    test = pd.read_csv("data/dmsc.test.csv", index_col=0)
-
+    train = pd.read_csv("processed/dmsc.train.csv", index_col=0)
     X_train, y_train, y_var_train = (
         train.index.values,
         train.y.values,
         train.y_var.values,
-    )
-    X_test, y_test, y_var_test = (
-        test.index.values,
-        test.y.values,
-        test.y_var.values,
     )
 
     # Compute the empirical correlation-distance function
@@ -25,4 +18,4 @@ if __name__ == "__main__":
         X=X_train, y=y_train - y_train.mean()
     )
     dcor = pd.DataFrame({"d": np.arange(cov.shape[0]), "rho": cov / cov[0]})
-    dcor.to_csv("data/dmsc.empirical_distance_correlation.csv")
+    dcor.to_csv("results/dmsc.empirical_distance_correlation.csv")

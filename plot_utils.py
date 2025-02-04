@@ -3,6 +3,33 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
+import matplotlib.patches as patches
+import seaborn as sns
+
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+
+FIG_WIDTH = 8
+
+# Fonts
+plt.rcParams["font.family"] = "Nimbus Sans"
+plt.rcParams["axes.titlesize"] = 7
+plt.rcParams["axes.labelsize"] = 7
+plt.rcParams["xtick.labelsize"] = 6
+plt.rcParams["ytick.labelsize"] = 6
+plt.rcParams["legend.fontsize"] = 6
+plt.rcParams["legend.labelspacing"] = 0.1
+
+plt.rcParams["axes.titlepad"] = 3
+
+# Linewidths
+plt.rcParams["axes.linewidth"] = 0.6
+plt.rcParams["xtick.major.width"] = 0.6
+plt.rcParams["ytick.major.width"] = 0.6
+plt.rcParams["xtick.minor.width"] = 0.35
+plt.rcParams["ytick.minor.width"] = 0.35
+
+
 
 def annotate_seq(
     axes, seq, label, df, dx, dy, ha, va, x="1", y="2", fontsize=None

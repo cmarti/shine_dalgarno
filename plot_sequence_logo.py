@@ -1,39 +1,37 @@
-from os.path import join
-
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import logomaker as lm
-
-from settings import SD_SORTSEQ_DIR, SD_BACKGROUNDS, PLOTS_DIR, SD_RIBOSEQ_DIR,\
-    SD_DIR
-from utils import LogTrack
-from gpmap.visualization import Visualization
-from plot_utils import savefig, init_fig
+import logomaker
+import matplotlib.pyplot as plt
+from plot_utils import FIG_WIDTH
 
 
 if __name__ == '__main__':
-    fpath = join(SD_DIR, 'seqdeft', 'sd_seq_genes.csv.gz')
-    data = pd.read_csv(fpath, index_col=0)
-    data = data.loc[data['species'] == 'e_coli'].set_index('gene_id')
-    
-    freqs = lm.alignment_to_matrix(data['SD'], to_type='probability')
-    freqs.index = np.arange(1, freqs.shape[0] + 1) - 14
-    
-    fig, subplots = init_fig(2, 1, colsize=4, rowsize=1.8)
-    
-    axes = subplots[0]
-    lm.Logo(freqs, ax=axes)
-    axes.set(ylabel='Nucleotide frequency', xticks=freqs.index,
-             xticklabels=[])
-    
-    info = lm.transform_matrix(freqs, from_type='probability', to_type='information')
-    
-    axes = subplots[1]
-    lm.Logo(info, ax=axes)
-    axes.set(ylabel='Information', xticks=info.index,
-             xlabel='Relative position to Start codon')
-    
-    sns.despine()
-    
-    savefig(fig, fname='e_coli_sd_logo')
+    upstream_bases = 20
+    distance_start_codon = 4
+    seq_length = 9
+    sd_start = upstream_bases - distance_start_codon - seq_length
+
+    print('Loading data')
+    gene_data = pd.read_csv('processed/gene_data.csv', index_col=0)
+    background_seqs = [x[:-upstream_bases] for x in gene_data['background']]
+
+    print('Computing allele frequencies')
+    allele_freqs = logomaker.alignment_to_matrix(background_seqs, to_type='probability', pseudocount=0)
+
+    print('Plotting logo')
+    fig, axes = plt.subplots(1, 1, figsize=(FIG_WIDTH * 0.5, FIG_WIDTH * 0.135))
+    logo = logomaker.Logo(allele_freqs, ax=axes, color_scheme='classic')
+    for p in list(range(sd_start)) + list(range(sd_start + seq_length, 20)):
+        for c in 'AUGC':
+            logo.style_single_glyph(p, c, alpha=0.3)
+
+    xticks = np.arange(allele_freqs.shape[0])
+    xticklabels = ['-{}'.format(x) for x in range(1, 21)[::-1]] + ['+1', '+2', '+3']
+    axes.set(ylabel='Frequency',
+            xlabel='Position relative to start codon',
+            xticks=xticks, xticklabels=xticklabels,
+            yticks=[0, 0.5, 1])
+    fig.tight_layout()
+    fig.savefig('figures/SD_sequence_logo.png', dpi=300)
+    # fig.savefig('figures/SD_sequence_logo.svg', dpi=300)

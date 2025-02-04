@@ -5,8 +5,8 @@ from gpmap.src.inference import VCregression
 
 
 if __name__ == "__main__":
-    train = pd.read_csv("data/dmsc.train.csv", index_col=0)
-    test = pd.read_csv("data/dmsc.test.csv", index_col=0)
+    train = pd.read_csv("processed/dmsc.train.csv", index_col=0)
+    test = pd.read_csv("processed/dmsc.test.csv", index_col=0)
 
     X_train, y_train, y_var_train = (
         train.index.values,
@@ -22,7 +22,7 @@ if __name__ == "__main__":
     # Compute the empirical correlation-distance function
     model = VCregression(seq_length=9, alphabet_type="rna")
     model.fit(X=X_train, y=y_train, y_var=y_var_train)
-    np.save("data/vc.lambdas.npy", model.lambdas)
+    np.save("results/vc.lambdas.npy", model.lambdas)
 
     # Save variance components
     vc = pd.DataFrame(
@@ -33,12 +33,12 @@ if __name__ == "__main__":
         }
     )
     vc["cum_perc"] = np.cumsum(vc["variance_perc"])
-    vc.to_csv("data/vc.prior_variance_components.csv")
+    vc.to_csv("results/vc.prior_variance_components.csv")
 
     exit()
 
     inferred = model.predict()
-    inferred.to_csv("data/inferred_vc_regression.csv")
+    inferred.to_csv("results/inferred_vc_regression.csv")
 
     test_pred = model.predict(X_pred=X_test, calc_variance=True)
-    test_pred.to_csv("data/SD_test.vc_pred.csv")
+    test_pred.to_csv("results/SD_test.vc_pred.csv")
