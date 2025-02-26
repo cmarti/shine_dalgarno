@@ -3,9 +3,37 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
+import matplotlib.patches as patches
+import seaborn as sns
+
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+
+FIG_WIDTH = 8
+
+# Fonts
+plt.rcParams["font.family"] = "Nimbus Sans"
+plt.rcParams["axes.titlesize"] = 7
+plt.rcParams["axes.labelsize"] = 6
+plt.rcParams["xtick.labelsize"] = 6
+plt.rcParams["ytick.labelsize"] = 6
+plt.rcParams["legend.fontsize"] = 6
+plt.rcParams["legend.labelspacing"] = 0.1
+
+# plt.rcParams["axes.titlepad"] = 3
+
+# Linewidths
+plt.rcParams["axes.linewidth"] = 0.6
+plt.rcParams["xtick.major.width"] = 0.6
+plt.rcParams["ytick.major.width"] = 0.6
+plt.rcParams["xtick.minor.width"] = 0.35
+plt.rcParams["ytick.minor.width"] = 0.35
+
+
 
 def annotate_seq(
-    axes, seq, label, df, dx, dy, ha, va, x="1", y="2", fontsize=None
+    axes, seq, label, df, dx, dy, ha, va, x="1", y="2", fontsize=None,
+    arrow_size=1,
 ):
     x, y = df.loc[seq, [x, y]]
     axes.annotate(
@@ -13,7 +41,11 @@ def annotate_seq(
         xy=(x, y),
         xytext=(x + dx, y + dy),
         arrowprops=dict(
-            facecolor="black", shrink=0.05, width=1, headwidth=6, headlength=10
+            facecolor="black",
+            shrink=0.05,
+            width=1 * arrow_size,
+            headwidth=6 * arrow_size,
+            headlength=10* arrow_size,
         ),
         ha=ha,
         va=va,
@@ -65,6 +97,8 @@ def plot_landscape(
     vmax=np.log(1e-3),
     c="function",
     z="3",
+    lims = (-3.1, 3.1),
+    log_p=True,
 ):
     nodes_hist_axes = axes.inset_axes((0.05, 0.875, 0.3, 0.1))
     nodes_cbar_axes = axes.inset_axes((0.05, 0.85, 0.3, 0.02))
@@ -87,9 +121,11 @@ def plot_landscape(
     )
 
     plot_function_hist(ndf, vmin, vmax, nodes_hist_axes, c)
-    arrange_cbar(nodes_cbar_axes)
-    ticks = np.array([-3, -2.5, -2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3])
-    lims = (-3.1, 3.1)
+    if log_p:
+        arrange_cbar(nodes_cbar_axes)
+        ticks = np.array([-3, -2.5, -2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3])
+    else:
+        ticks = np.array([-2.5, -2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5])
     arrange_axis(axes, x, y, ticks, lims)
 
 
@@ -108,7 +144,8 @@ def arrange_cbar(nodes_cbar_axes):
     )
 
 
-def arrange_axis(axes, x, y, ticks, lims):
+def arrange_axis(axes, x, y, ticks, lims, fontsize=12,
+                 xpos=0.52, ypos=0.52, ms=5):
     axes.set(aspect="equal", xlabel="", ylabel="")
     axes.spines["left"].set(position=("data", 0), zorder=0, alpha=0.5)
     axes.spines["bottom"].set(position=("data", 0), zorder=0, alpha=0.5)
@@ -118,7 +155,7 @@ def arrange_axis(axes, x, y, ticks, lims):
         (0),
         ls="",
         marker=">",
-        ms=5,
+        ms=ms,
         color="k",
         transform=axes.get_yaxis_transform(),
         clip_on=False,
@@ -128,26 +165,26 @@ def arrange_axis(axes, x, y, ticks, lims):
         (1),
         ls="",
         marker="^",
-        ms=5,
+        ms=ms,
         color="k",
         transform=axes.get_xaxis_transform(),
         clip_on=False,
     )
     axes.text(
-        1,
-        0.52,
+        1.1,
+        xpos,
         "Diffusion axis {}".format(x),
         transform=axes.transAxes,
-        fontsize=12,
+        fontsize=fontsize,
         ha="right",
         va="bottom",
     )
     axes.text(
-        0.52,
+        ypos,
         1,
         "Diffusion axis {}".format(y),
         transform=axes.transAxes,
-        fontsize=12,
+        fontsize=fontsize,
         ha="left",
         va="top",
     )
@@ -170,9 +207,73 @@ def plot_relaxation_times(relaxation_times, axes):
     axes.axhline(0.25, c="grey", lw=0.75, label="Neutral", linestyle="--")
     axes.legend(loc=1)
     axes.set(
-        ylim=(0.2, 0.75),
+        ylim=(0.2, None),
         # xticks=relaxation_times["k"],
         xticks=[1, 5, 10, 15, 20],
     )
     axes.set_ylabel("Relaxation time\n(expected substitutions)", fontsize=10)
     axes.set_xlabel("Diffusion axis", fontsize=10)
+    
+    
+def add_vcregression_labels(axes, nodes_df, fontsize=6, label_path=True, arrow_size=1):
+    annotate_seq(
+        axes,
+        "AAGGAGCAG",
+        r"A$\bf{AGGAG}$CAG",
+        nodes_df,
+        dx=0.7,
+        dy=0.7,
+        ha="left",
+        va="bottom",
+        fontsize=fontsize,
+        arrow_size=arrow_size,
+    )
+    annotate_seq(
+        axes,
+        "UAAGGAGCA",
+        r"UA$\bf{AGGAG}$CA",
+        nodes_df,
+        dx=-0.7,
+        dy=-0.7,
+        ha="center",
+        va="top",
+        fontsize=fontsize,
+        arrow_size=arrow_size,
+    )
+    annotate_seq(
+        axes,
+        "UUAAGGAGC",
+        r"UUA$\bf{AGGAG}$C",
+        nodes_df,
+        dx=0.7,
+        dy=-0.7,
+        ha="center",
+        va="top",
+        fontsize=fontsize,
+        arrow_size=arrow_size,
+    )
+    if label_path:
+        annotate_seq(
+            axes,
+            "AGGAGAAUA",
+            r"$\bf{AGGAG}$AAUA",
+            nodes_df,
+            dx=0.2,
+            dy=-1.2,
+            ha="left",
+            va="bottom",
+            fontsize=fontsize,
+            arrow_size=arrow_size,
+        )
+        annotate_seq(
+            axes,
+            "AGGAGGAGC",
+            r"$\bf{AGGAGGAG}$A",
+            nodes_df,
+            dx=0.1,
+            dy=-0.8,
+            ha="left",
+            va="top",
+            fontsize=fontsize,
+            arrow_size=arrow_size,
+        )
