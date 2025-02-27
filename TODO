@@ -3,8 +3,11 @@ PAPER
     - Scanning selection strenght in dmsC. Figure with relaxation times and another with the visualizations
     - Axis 3 (4) in dmsC visualization
     - Probability vs frequency scatterplot
-    - Relaxation times in dmsC and TD model
-    - Scatterplot of predictions in TD model (or all models) in traning and test data
+    - Supp fig for the TD model:
+      - training curve of the TD model
+      - Scatterplot of predictions in TD model (or all models) in training and test data
+      - Relaxation times
+      - Visualization of the errors
 
 CODE
 - Organize SD repository
@@ -15,4 +18,8 @@ CODE
     - Think whether to include a section on SD
 
 ADDITIONAL STUFF
-- Plot errors of the TD model on the visualization directly
+- Plot errors of the TD model on the visualization directly to find systematic differences
+- Visualizations of the pairwise model as well: emphasizes the usefulness of the visualization for model comparison (as the comparison with the TD model)
+
+NOTES
+- Remember that we are illustrating the software. Additional stuff should show quantities that we have shown before or illustrate things that we can do with it that are interesting
