@@ -14,7 +14,7 @@ FIG_WIDTH = 8
 # Fonts
 plt.rcParams["font.family"] = "Nimbus Sans"
 plt.rcParams["axes.titlesize"] = 7
-plt.rcParams["axes.labelsize"] = 6
+plt.rcParams["axes.labelsize"] = 7
 plt.rcParams["xtick.labelsize"] = 6
 plt.rcParams["ytick.labelsize"] = 6
 plt.rcParams["legend.fontsize"] = 6
@@ -30,22 +30,60 @@ plt.rcParams["xtick.minor.width"] = 0.35
 plt.rcParams["ytick.minor.width"] = 0.35
 
 
-
 def annotate_seq(
-    axes, seq, label, df, dx, dy, ha, va, x="1", y="2", fontsize=None,
-    arrow_size=1,
+    axes,
+    seq,
+    df,
+    dx,
+    dy,
+    ha,
+    va,
+    x="1",
+    y="2",
+    fontsize=None,
+    arrow_size=0.75,
 ):
+    labels = {
+        "AAGGAGCAG": r"A$\bf{AGGAG}$CAG",
+        "UUAAGGAGC": r"UUA$\bf{AGGAG}$C",
+        "UAAGGAGCA": r"UA$\bf{AGGAG}$CA",
+        "AGGAGAAUA": r"$\bf{AGGAG}$AAUA",
+        "AGGAGGAGC": r"$\bf{AGGAGGAG}$C",
+        "GAGUUUAAU": r"$\bf{GAG}$UUUAAU",
+        "GAGGUUCAG": r"$\bf{GAGG}$UUCAG",
+        "UAGGAGGUA": r"U$\bf{AGGAGGU}$A",
+        "GGAGGUACA": r"$\bf{GGAGGU}$ACA",
+        "GGAGUUUAA": r"$\bf{GGAG}$UUUAA",
+        "GAGGAGGAU": r"$\bf{GAGGAGG}$AU",
+        "GGAGGAGAA": r"$\bf{GGAGGAG}$AA",
+        "AAGGAAUAU": r"A$\bf{AGGA}$AUAU",
+        "GGAGGAAUA": r"$\bf{GGAGG}$AAUA",
+        "CAGGAGGUA": r"C$\bf{AGGAGG}$UA",
+        "AGGAGGUAC": r"$\bf{AGGAGG}$UAC",
+        "AGGAGGAGG": r"$\bf{AGGAGGAGG}$",
+        "UUAAGGAGG": r"UUA$\bf{AGGAGG}$",
+        "GGAGGUACC": r"$\bf{GGAGG}$UACC",
+        "GGAGGAGGU": r"$\bf{GGAGGAGG}$U",
+        "UAAGGAGGU": r"UA$\bf{AGGAGG}$U",
+        "UUAGGAGGA": r"UU$\bf{AGGAGG}$A",
+        "AAGGAGCUG": r"A$\bf{AGGAG}$CUG",
+        "CAAAGGAGG": r"CAA$\bf{AGGAGG}$",
+        "GGAGGAGGA": r"$\bf{GGAGGAGG}A$",
+        "GGAGGUUUA": r"$\bf{GGAGG}$UUUA",
+        "AGGAGGUUA": r"$\bf{AGGAGG}$UUA",
+    }
+
     x, y = df.loc[seq, [x, y]]
     axes.annotate(
-        label,
+        labels.get(seq, seq),
         xy=(x, y),
         xytext=(x + dx, y + dy),
         arrowprops=dict(
             facecolor="black",
             shrink=0.05,
             width=1 * arrow_size,
-            headwidth=6 * arrow_size,
-            headlength=10* arrow_size,
+            headwidth=7 * arrow_size,
+            headlength=12 * arrow_size,
         ),
         ha=ha,
         va=va,
@@ -53,16 +91,17 @@ def annotate_seq(
     )
 
 
-def plot_path(axes, nodes, x="1", y="2", size=40, lw=1.5):
-    seqs = [
-        "AGGAGAAUA",
-        "AGGAGGAUA",
-        "AGGAGGAGA",
-        "AGGAGGAGC",
-        "UGGAGGAGC",
-        "UUGAGGAGC",
-        "UUAAGGAGC",
-    ]
+def plot_path(axes, nodes, x="1", y="2", size=40, lw=1.5, seqs=None):
+    if seqs is None:
+        seqs = [
+            "AGGAGAAUA",
+            "AGGAGGAUA",
+            "AGGAGGAGA",
+            "AGGAGGAGC",
+            "UGGAGGAGC",
+            "UUGAGGAGC",
+            "UUAAGGAGC",
+        ]
     sl = len(seqs)
     edf = pd.DataFrame({"i": np.arange(sl - 1), "j": np.arange(1, sl)})
     ndf = nodes.loc[seqs, :]
@@ -97,8 +136,12 @@ def plot_landscape(
     vmax=np.log(1e-3),
     c="function",
     z="3",
-    lims = (-3.1, 3.1),
+    lims=(-3.1, 3.1),
+    size=5,
     log_p=True,
+    ypos=0.52,
+    xpos=0.52,
+    label_size=8,
 ):
     nodes_hist_axes = axes.inset_axes((0.05, 0.875, 0.3, 0.1))
     nodes_cbar_axes = axes.inset_axes((0.05, 0.85, 0.3, 0.02))
@@ -111,7 +154,7 @@ def plot_landscape(
         sort_by=z,
         sort_ascending=True,
         color=c,
-        size=5,
+        size=size,
         cmap="viridis",
         cbar_axes=nodes_cbar_axes,
         cbar_label=cmap_label,
@@ -121,31 +164,48 @@ def plot_landscape(
     )
 
     plot_function_hist(ndf, vmin, vmax, nodes_hist_axes, c)
+    nodes_hist_axes.set_facecolor("none")
     if log_p:
         arrange_cbar(nodes_cbar_axes)
-        ticks = np.array([-3, -2.5, -2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3])
+        ticks = np.array(
+            [-3, -2.5, -2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3]
+        )
     else:
-        ticks = np.array([-2.5, -2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5])
-    arrange_axis(axes, x, y, ticks, lims)
+        ticks = np.array(
+            [-2.5, -2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5]
+        )
+    arrange_axis(
+        axes,
+        x,
+        y,
+        ticks,
+        lims,
+        ypos=ypos,
+        xpos=xpos,
+        fontsize=label_size,
+    )
+    return nodes_cbar_axes, nodes_hist_axes
 
 
 def plot_function_hist(ndf, vmin, vmax, nodes_hist_axes, c):
     bins = np.linspace(vmin, vmax, 30)
     plot.plot_color_hist(nodes_hist_axes, ndf[c], cmap="viridis", bins=bins)
-    nodes_hist_axes.set_ylabel("Frequency", fontsize=10)
+    nodes_hist_axes.set_ylabel("Frequency", fontsize=7)
 
 
 def arrange_cbar(nodes_cbar_axes):
     yticklabels = 10 ** np.arange(-7, -2).astype(float)
-    nodes_cbar_axes.set_xlabel("Sequence probability", fontsize=10)
+    nodes_cbar_axes.set_xlabel("Sequence probability", fontsize=7)
     nodes_cbar_axes.set_xticks(np.log(yticklabels))
     nodes_cbar_axes.set_xticklabels(
-        ["$10^{-7}$", "$10^{-6}$", "$10^{-5}$", "$10^{-4}$", "$10^{-3}$"]
+        ["$10^{-7}$", "$10^{-6}$", "$10^{-5}$", "$10^{-4}$", "$10^{-3}$"],
+        fontsize=6,
     )
 
 
-def arrange_axis(axes, x, y, ticks, lims, fontsize=12,
-                 xpos=0.52, ypos=0.52, ms=5):
+def arrange_axis(
+    axes, x, y, ticks, lims, fontsize=8, xpos=0.52, ypos=0.52, ms=5
+):
     axes.set(aspect="equal", xlabel="", ylabel="")
     axes.spines["left"].set(position=("data", 0), zorder=0, alpha=0.5)
     axes.spines["bottom"].set(position=("data", 0), zorder=0, alpha=0.5)
@@ -196,7 +256,7 @@ def plot_relaxation_times(relaxation_times, axes):
         relaxation_times["k"],
         relaxation_times["relaxation_time"],
         c="black",
-        s=10,
+        s=5,
     )
     axes.plot(
         relaxation_times["k"],
@@ -211,15 +271,16 @@ def plot_relaxation_times(relaxation_times, axes):
         # xticks=relaxation_times["k"],
         xticks=[1, 5, 10, 15, 20],
     )
-    axes.set_ylabel("Relaxation time\n(expected substitutions)", fontsize=10)
-    axes.set_xlabel("Diffusion axis", fontsize=10)
-    
-    
-def add_vcregression_labels(axes, nodes_df, fontsize=6, label_path=True, arrow_size=1):
+    axes.set_ylabel("Relaxation time\n(expected substitutions)")
+    axes.set_xlabel("Diffusion axis")
+
+
+def add_vcregression_labels(
+    axes, nodes_df, fontsize=6, label_path=True, arrow_size=1
+):
     annotate_seq(
         axes,
-        "AAGGAGCAG",
-        r"A$\bf{AGGAG}$CAG",
+        "UAGGAGGUA",
         nodes_df,
         dx=0.7,
         dy=0.7,
@@ -231,7 +292,6 @@ def add_vcregression_labels(axes, nodes_df, fontsize=6, label_path=True, arrow_s
     annotate_seq(
         axes,
         "UAAGGAGCA",
-        r"UA$\bf{AGGAG}$CA",
         nodes_df,
         dx=-0.7,
         dy=-0.7,
@@ -243,7 +303,6 @@ def add_vcregression_labels(axes, nodes_df, fontsize=6, label_path=True, arrow_s
     annotate_seq(
         axes,
         "UUAAGGAGC",
-        r"UUA$\bf{AGGAG}$C",
         nodes_df,
         dx=0.7,
         dy=-0.7,
@@ -256,7 +315,6 @@ def add_vcregression_labels(axes, nodes_df, fontsize=6, label_path=True, arrow_s
         annotate_seq(
             axes,
             "AGGAGAAUA",
-            r"$\bf{AGGAG}$AAUA",
             nodes_df,
             dx=0.2,
             dy=-1.2,
@@ -268,7 +326,6 @@ def add_vcregression_labels(axes, nodes_df, fontsize=6, label_path=True, arrow_s
         annotate_seq(
             axes,
             "AGGAGGAGC",
-            r"$\bf{AGGAGGAG}$A",
             nodes_df,
             dx=0.1,
             dy=-0.8,

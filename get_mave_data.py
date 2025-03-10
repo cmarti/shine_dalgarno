@@ -17,7 +17,7 @@ if __name__ == "__main__":
         df.shape[0] - data.shape[0]
     )
     data["y_var"] = sample_var / data["n_measured"]
-    data.to_csv("data/dmsc_processed.csv")
+    data.to_csv("processed/dmsc.csv")
 
     # Split into test and training sets
     np.random.seed(0)
