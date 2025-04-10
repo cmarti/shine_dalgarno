@@ -1,26 +1,26 @@
-import pandas as pd
 import numpy as np
 
-from gpmap.src.inference import SeqDEFT
+from gpmap.inference import SeqDEFT
 
 
 if __name__ == "__main__":
-    for species in ["b_sub"]:  # . 'e_coli]:
-        print("Loading data from {}".format(species))
-        X = np.array(
-            [
-                line.strip()
-                for line in open("processed/{}.SD_seqs.txt".format(species))
-            ]
-        )
+    print("Computing Maximum a Posteriori")
+    for species in ["b_sub", "e_coli"]:
+        print("Analyzing data from {} genome".format(species))
 
+        print("\tLoading data")
+        fpath = "processed/{}.SD_seqs.txt".format(species)
+        X = np.array([line.strip() for line in open(fpath)])
+
+        print("\tLoading hyperparameter")
         with open("data/optimal_a.txt", "r") as fhand:
             optimal_a = float([line.strip() for line in fhand][0])
 
+        print("\tInferring genotype-phenotype map")
         model = SeqDEFT(P=2, a=optimal_a, seq_length=9, alphabet_type="rna")
         model.set_data(X=X)
+        pred = model.predict()
 
-        print("Start computation")
-        X_test = pd.read_csv("data/SD_test_pred.csv", index_col=0).index.values
-        test_pred = model.predict(X_pred=X_test, calc_variance=True)
-        test_pred.to_csv("data/{}.seqdeft_test_pred.csv".format(species))
+        print("\tStoring results")
+        fpath = "results/{}.seqdeft_inference.csv".format(species)
+        pred.to_csv(fpath)
