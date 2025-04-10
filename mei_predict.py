@@ -1,9 +1,6 @@
 import pandas as pd
-import numpy as np
 
-from gpmap.src.inference import MinimumEpistasisInterpolator
-from gpmap.src.linop import DeltaPOperator
-from gpmap.src.matrix import quad
+from gpmap.inference import MinimumEpistasisInterpolator
 
 if __name__ == "__main__":
     print("Loading data")
@@ -22,26 +19,15 @@ if __name__ == "__main__":
     )
 
     print("Interpolating missing sequences using MEI")
-    model = MinimumEpistasisInterpolator(P=2, seq_length=9, alphabet_type="rna")
-    model.set_data(X=X_train, y=y_train)
-    y_pred = model.predict()
-    y_pred.loc[X_test, :].to_csv("results/mei.test.csv")
-
-    D = DeltaPOperator(4, 9, P=2)
-    e2 = quad(D, y_pred["y"]) / D.n_p_faces
-    sd = np.sqrt(e2)
-    print(D.n_p_faces)
-    print("e2 = {:.2f}".format(e2))
-    print("sd = {:.2f}".format(sd))
-    print(train["y"].min(), train["y"].max())
+    model = MinimumEpistasisInterpolator(
+        seq_length=9, alphabet_type="rna", P=2
+    )
     
+    print("Computing MAP for complete sequence-space")
+    inferred = model.predict()
+    inferred.to_csv("results/inferred_vc_regression.csv")
     
-    D = DeltaPOperator(4, 9, P=1)
-    print(D.n_p_faces)
-    e2 = quad(D, y_pred["y"]) / D.n_p_faces
-    sd = np.sqrt(e2)
-    print("e2 = {:.2f}".format(e2))
-    print("sd = {:.2f}".format(sd))
-    print(train["y"].min(), train["y"].max())
-
-    print("Done")
+    print("Computing posterior variances for test data")
+    model.fit(X=X_train, y=y_train)
+    pred = model.predict(X_pred=X_test, calc_variance=True)
+    pred.to_csv("results/mei.test.csv")
