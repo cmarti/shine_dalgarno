@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from gpmap.src.inference import VCregression
+from gpmap.inference import VCregression
 
 
 if __name__ == "__main__":
@@ -34,11 +34,3 @@ if __name__ == "__main__":
     )
     vc["cum_perc"] = np.cumsum(vc["variance_perc"])
     vc.to_csv("results/vc.prior_variance_components.csv")
-
-    exit()
-
-    inferred = model.predict()
-    inferred.to_csv("results/inferred_vc_regression.csv")
-
-    test_pred = model.predict(X_pred=X_test, calc_variance=True)
-    test_pred.to_csv("results/SD_test.vc_pred.csv")

@@ -1,11 +1,11 @@
 import numpy as np
 import pandas as pd
 
-from gpmap.src.inference import VCregression
+from gpmap.inference import VCregression
 
 
 if __name__ == "__main__":
-    print('Loading data')
+    print("Loading data")
     train = pd.read_csv("processed/dmsc.train.csv", index_col=0)
     test = pd.read_csv("processed/dmsc.test.csv", index_col=0)
 
@@ -24,10 +24,10 @@ if __name__ == "__main__":
     model = VCregression(seq_length=9, alphabet_type="rna", lambdas=lambdas)
     model.set_data(X=X_train, y=y_train, y_var=y_var_train)
 
-    print('Computing MAP for complete sequence-space')
+    print("Computing MAP for complete sequence-space")
     inferred = model.predict()
     inferred.to_csv("results/inferred_vc_regression.csv")
 
-    print('Computing posterior variances for test data')
+    print("Computing posterior variances for test data")
     test_pred = model.predict(X_pred=X_test, calc_variance=True)
     test_pred.to_csv("results/SD_test.vc_pred.csv")
