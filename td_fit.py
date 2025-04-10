@@ -3,20 +3,25 @@ import pandas as pd
 
 import torch
 from tqdm import tqdm
-from scipy.stats import pearsonr
+from itertools import product
 
 
 class ThermodynamicModel(torch.nn.Module):
-    def __init__(self, seq0="AGGAGGUA"):
+    def __init__(self, seq_length=8, alphabet='ACGU'):
         super().__init__()
-        self.seq0 = seq0
-        self.l = len(seq0)
+        self.l = seq_length
+        self.n_alleles = len(alphabet)
+        self.alphabet = alphabet
+        self.n = int(self.n_alleles ** self.l)
         self.upstream_seq = "CCG"
         self.downstream_seq = "UGAG"
         self.npos = (
-            len(self.upstream_seq) + len(self.downstream_seq) + 9 - self.l
+            len(self.upstream_seq) + len(self.downstream_seq) + 9 - self.l - 1
         )
         self.init_params()
+        self.seqs = ["".join(c) for c in product(alphabet, repeat=self.l)]
+        self.seqs_idx = pd.Series(range(self.n), index=self.seqs)
+        self.X = self.seqs_to_x(self.seqs)
 
     def seqs_to_x(self, seqs):
         x = np.array([[c for c in s] for s in seqs])
@@ -26,102 +31,87 @@ class ThermodynamicModel(torch.nn.Module):
         return X
 
     def encode_seqs(self, seqs):
-        extended_seqs = [
-            [
-                (self.upstream_seq + seq + self.downstream_seq)[i : i + self.l]
-                for seq in seqs
-            ]
+        seqs_idx = [
+            self.seqs_idx.loc[
+                [
+                    (self.upstream_seq + seq + self.downstream_seq)[
+                        i : i + self.l
+                    ]
+                    for seq in seqs
+                ]
+            ].values
             for i in range(self.npos)
         ]
-        X = torch.stack([self.seqs_to_x(s) for s in extended_seqs], axis=3)
-        return X
+        seqs_idx = np.array(seqs_idx).T
+        return torch.Tensor(seqs_idx).to(dtype=torch.long)
 
     def init_params(self):
-        self.theta_raw = torch.nn.Parameter(
-            torch.normal(torch.zeros((self.l, 4)))
-        )
-        self.theta0 = torch.nn.Parameter(torch.zeros(1, self.npos))
-        self.background = torch.nn.Parameter(
-            torch.zeros(
-                1,
-            )
-        )
-        self.max_value = torch.nn.Parameter(
-            torch.ones(
-                1,
-            )
-        )
-        self.log_sigma2 = torch.nn.Parameter(
-            torch.zeros(
-                1,
-            )
-        )
+        theta_raw0 = torch.zeros((self.l, 4))
+        # Initialize with a AGGAGGUA
+        theta_raw0[0, 0] = -2
+        theta_raw0[1, 2] = -2
+        theta_raw0[2, 2] = -2
+        theta_raw0[3, 0] = -2
+        theta_raw0[4, 2] = -2
+        theta_raw0[5, 2] = -2
+        theta_raw0[6, 3] = -2
+        theta_raw0[7, 0] = -2
+        self.theta_raw = torch.nn.Parameter(theta_raw0)
+        self.theta0 = torch.nn.Parameter(6.0 * torch.ones(1))
+        self.background = torch.nn.Parameter(0.47 * torch.ones(1))
+        self.log_sigma2 = torch.nn.Parameter(torch.zeros(1))
 
     @property
     def theta(self):
         return self.theta_raw - self.theta_raw.mean(1).unsqueeze(1)
-        # return(self.theta_raw)
 
     @property
     def sigma2(self):
         return torch.exp(self.log_sigma2)
 
-    def summary(self, pred=None, obs=None):
-        print("===========================")
-        print("Log-likelihood = {:.2f}".format(model.history[-1]))
-        print("======= Parameters ========")
-        for param, values in self.get_params().items():
-            print("--- {} ---".format(param))
-            print(values)
+    def get_phi0(self):
+        return self.theta0 + torch.einsum("ila,la->i", self.X, self.theta)
 
-        if pred is not None and obs is not None:
-            r = pearsonr(pred, obs)[0]
-            print("======= Predictions ========")
-            print("Pearson r = {:.2f}".format(r))
+    def X_to_phi(self, X):
+        phi0 = self.get_phi0()
+        phi = torch.stack([phi0[X[:, i]] for i in range(self.npos)], axis=1)
+        return phi
 
     def predict(self, X):
-        phi = self.theta0 + torch.tensordot(
-            X, self.theta, dims=((1, 2), (0, 1))
-        )
-        # mu = torch.exp(-phi).sum(axis=1)
-        # p = mu / (1 + mu)
+        phi = self.X_to_phi(X)
         mu = torch.logsumexp(-phi, axis=1)
-        p = torch.exp(mu - torch.logaddexp(torch.tensor([1.]), mu))
-        yhat = self.background + self.max_value * p
-        # yhat = self.background + mu
+        yhat = torch.logaddexp(self.background, mu)
         return yhat
 
-    def fit(self, seqs, y, y_var, n_iter=1000, lr=0.1):
+    def calc_log_likelihood(self, X, y, y_var):
+        yhat = self.predict(X)
+        return -torch.nn.functional.gaussian_nll_loss(
+            yhat, y, y_var + self.sigma2, reduction="sum"
+        )
+
+    def fit(self, seqs, y, y_var, n_iter=1500, lr=0.02):
         X = self.encode_seqs(seqs)
         y = torch.Tensor(y)
         y_var = torch.Tensor(y_var)
+        n_obs = y.shape[0]
 
         optimizer = torch.optim.Adam(self.parameters(), lr=lr, maximize=True)
         history = []
         pbar = tqdm(range(n_iter))
         for i in pbar:
             optimizer.zero_grad()
-            yhat = self.predict(X)
-            ll = -torch.nn.functional.gaussian_nll_loss(
-                yhat, y, y_var + self.sigma2, reduction="sum"
-            )
+            ll = self.calc_log_likelihood(X, y, y_var)
             ll.backward()
             history.append(ll.detach().item())
             optimizer.step()
-            pbar.set_postfix({"ll": history[-1]})
+            pbar.set_postfix({"ll": history[-1] / n_obs})
         self.history = history
 
-    def get_params(self):
-        params = {
-            "theta0": self.theta0.detach().numpy()[0],
-            "theta": pd.DataFrame(
-                self.theta.detach().numpy(), columns=["A", "C", "G", "U"]
-            ),
-            "background": self.background.detach().numpy()[0],
-            "max_value": self.max_value.detach().numpy()[0],
-            "sigma2": self.sigma2.detach().numpy()[0],
-        }
-        return params
+    def save_phi0(self, fpath):
+        phi0 = pd.DataFrame(
+            {"phi": self.get_phi0().detach().numpy()}, index=self.seqs
+        )
+        phi0.to_csv(fpath)
 
 
 if __name__ == "__main__":
@@ -132,9 +122,10 @@ if __name__ == "__main__":
         train.y_var.values,
     )
 
-    model = ThermodynamicModel(seq0="AGGAGGUA")
-    model.fit(X_train, y_train, y_var_train, n_iter=2500, lr=0.01)
+    model = ThermodynamicModel()
+    model.fit(X_train, y_train, y_var_train, n_iter=1500, lr=0.02)
 
+    model.save_phi0("results/thermodynamic_model_additive.csv")
     params = model.state_dict()
     torch.save(params, "results/thermodynamic_model.pth")
 
