@@ -1,0 +1,7 @@
+scrap
+figures/*png
+figures/*svg
+processed
+results
+.snakemake
+.ipynb_checkpoints
