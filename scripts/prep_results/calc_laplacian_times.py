@@ -21,8 +21,10 @@ if __name__ == "__main__":
         ("dna", 4, 12),
         ("protein", 20, 5),
     ]:
+        print("Computing matrix-vector products in {} space".format(alphabet))
         for seq_length in range(1, max_length + 1):
             n = int(n_alleles**seq_length)
+            print("\tSequence length = {}".format(seq_length))
 
             for label, operator in operators.items():
                 if n > 5e6 and label == "Sparse matrix":
