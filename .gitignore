@@ -1,7 +1,10 @@
 scrap
-figures/*png
-figures/*svg
+figures
+structures
+manuscript
 processed
 results
+
 .snakemake
 .ipynb_checkpoints
+activate.sh
