@@ -17,7 +17,7 @@ if __name__ == "__main__":
             model = VCregression(
                 seq_length=seq_length, alphabet_type=alphabet, lambdas=lambdas
             )
-            y = model.sample()
+            y = model.sample_prior()
 
             space = SequenceSpace(X=model.genotypes, y=y)
             rw = WMWalk(space)
@@ -51,7 +51,7 @@ if __name__ == "__main__":
                         "ds": t2,
                     }
                 )
-                print(results[-1])
+                # print(results[-1])
 
     results = pd.DataFrame(results)
-    results.to_csv("results/rendering_times.csv")
+    results.to_csv("results/times_rendering.csv")

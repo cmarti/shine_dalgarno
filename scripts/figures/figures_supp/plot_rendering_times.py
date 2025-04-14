@@ -6,12 +6,14 @@ from scripts.figures.plot_utils import FIG_WIDTH
 
 if __name__ == "__main__":
     labels = {"ds": "Datashader", "mpl": "Matplotlib"}
-    times = pd.read_csv("results/rendering_times.csv", index_col=0)
+
+    print("Loading rendering times data")
+    times = pd.read_csv("results/times_rendering.csv", index_col=0)
     times["a"] = [4 if x == "dna" else 20 for x in times["type"]]
     times["n"] = times["a"] ** times["seq_length"]
     times = times.iloc[1:, :]
-    print(times)
 
+    print("Plotting rendering times")
     fig, subplots = plt.subplots(
         1,
         2,
@@ -46,5 +48,5 @@ if __name__ == "__main__":
         axes.legend(loc=2)
 
     fig.tight_layout()
-    fig.savefig("figures/rendering_times.png", dpi=300)
-    fig.savefig("figures/rendering_times.svg", dpi=300)
+    fig.savefig("figures/times_rendering.png", dpi=300)
+    fig.savefig("figures/times_rendering.svg", dpi=300)

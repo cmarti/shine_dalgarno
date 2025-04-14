@@ -1,3 +1,4 @@
+import matplotlib
 import gpmap.plot.ds as dplot
 import gpmap.plot.mpl as mplot
 import pandas as pd
@@ -12,16 +13,18 @@ from scripts.figures.plot_utils import (
 
 
 if __name__ == "__main__":
-    x, y, z = '1', '2', '3'
-    
-    import matplotlib
+    x, y, z = "1", "2", "3"
 
     matplotlib.use("Agg")
 
-    nodes_df = pd.read_parquet("results/rnamodel.nodes.pq")
-    edges_df = read_edges("results/seqdeft.edges.npz")
+    print("Loading visualization data from RNA model")
+    nodes_df = pd.read_parquet("results/rna_model.nodes.pq")
+    edges_df = read_edges("results/edges.npz")
 
-    dsg = dplot.plot_edges(nodes_df, edges_df=edges_df, x=x, y=y, resolution=800)
+    print("Plotting visualization")
+    dsg = dplot.plot_edges(
+        nodes_df, edges_df=edges_df, x=x, y=y, resolution=800
+    )
     fig = dplot.dsg_to_fig(dsg)
     fig.set_size_inches((FIG_WIDTH * 0.45, FIG_WIDTH * 0.45))
     axes = fig.axes[0]
@@ -35,7 +38,6 @@ if __name__ == "__main__":
         nodes_df,
         x=x,
         y=y,
-        # sort_by="function",
         sort_ascending=True,
         sort_by=z,
         size=3,
@@ -54,7 +56,6 @@ if __name__ == "__main__":
     )
     nodes_cbar_axes.set_xlabel("log(GFP)", fontsize=7)
     ticks = [-2.0, -1, 0, 1, 2, 3, 4]
-    # lims = [-3-1, 3.]
     arrange_axis(axes, x, y, ticks, None, fontsize=8, xpos=0.365, ypos=0.4)
     axes.set(
         xticks=ticks,
@@ -75,7 +76,9 @@ if __name__ == "__main__":
         "UUGAGGAGG",
         "UUAAGGAGG",
     ]
-    plot_path(axes, nodes_df, size=20, seqs=seqs, vmin=vmin, vmax=vmax, x=x, y=y)
+    plot_path(
+        axes, nodes_df, size=20, seqs=seqs, vmin=vmin, vmax=vmax, x=x, y=y
+    )
 
     seqs = [
         "CAGGAGGUA",
@@ -87,7 +90,9 @@ if __name__ == "__main__":
         "GAGGUUAAU",
         "GAGUUUAAU",
     ]
-    plot_path(axes, nodes_df, size=20, seqs=seqs, vmin=vmin, vmax=vmax, x=x, y=y)
+    plot_path(
+        axes, nodes_df, size=20, seqs=seqs, vmin=vmin, vmax=vmax, x=x, y=y
+    )
 
     seqs = [
         "UAAGGAGGU",
@@ -98,9 +103,11 @@ if __name__ == "__main__":
         "GGAGGAACC",
         "GGAGGUACC",
     ]
-    plot_path(axes, nodes_df, size=20, seqs=seqs, vmin=vmin, vmax=vmax, x=x, y=y)
+    plot_path(
+        axes, nodes_df, size=20, seqs=seqs, vmin=vmin, vmax=vmax, x=x, y=y
+    )
 
-    kwargs = {"fontsize": 7, "arrow_size": 0.35, 'x': x, 'y': y}
+    kwargs = {"fontsize": 7, "arrow_size": 0.35, "x": x, "y": y}
     annotate_seq(
         axes,
         "CAGGAGGUA",
@@ -132,7 +139,7 @@ if __name__ == "__main__":
         va="bottom",
         **kwargs,
     )
-    
+
     annotate_seq(
         axes,
         "UUAAGGAGG",
@@ -158,12 +165,12 @@ if __name__ == "__main__":
         "AGGAGGUAC",
         nodes_df,
         dx=0.5,
-        dy=0.,
+        dy=0.0,
         ha="left",
         va="center",
         **kwargs,
     )
-    
+
     annotate_seq(
         axes,
         "UAAGGAGGU",
@@ -197,5 +204,5 @@ if __name__ == "__main__":
     )
 
     fig.tight_layout()
-    fig.savefig("figures/rnamodel_visualization.png", dpi=300)
-    fig.savefig("figures/rnamodel_visualization.svg", dpi=600)
+    fig.savefig("figures/rna_model_visualization.png", dpi=300)
+    fig.savefig("figures/rna_model_visualization.svg", dpi=600)

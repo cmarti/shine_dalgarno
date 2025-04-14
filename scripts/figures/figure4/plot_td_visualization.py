@@ -1,6 +1,9 @@
+import pandas as pd
+import matplotlib
+
 import gpmap.plot.ds as dplot
 import gpmap.plot.mpl as mplot
-import pandas as pd
+
 from gpmap.utils import read_edges
 from scripts.figures.plot_utils import (
     annotate_seq,
@@ -12,12 +15,11 @@ from scripts.figures.plot_utils import (
 
 
 if __name__ == "__main__":
-    import matplotlib
-
     matplotlib.use("Agg")
 
+    print("Loading data for plotting")
     nodes_df = pd.read_parquet("results/thermodynamic_model.nodes.pq")
-    edges_df = read_edges("results/seqdeft.edges.npz")
+    edges_df = read_edges("results/edges.npz")
 
     dsg = dplot.plot_edges(nodes_df, edges_df=edges_df, resolution=800)
     fig = dplot.dsg_to_fig(dsg)
@@ -27,11 +29,11 @@ if __name__ == "__main__":
     nodes_hist_axes = axes.inset_axes((0.0, 0.88, 0.3, 0.1))
     nodes_cbar_axes = axes.inset_axes((0.0, 0.85, 0.3, 0.02))
 
+    print("Loading thermodynamic model visualization")
     vmin, vmax = 0, 3.5
     mplot.plot_nodes(
         axes,
         nodes_df,
-        # sort_by="function",
         sort_ascending=True,
         sort_by="3",
         size=3,
@@ -50,7 +52,6 @@ if __name__ == "__main__":
     )
     nodes_cbar_axes.set_xlabel("log(GFP)", fontsize=7)
     ticks = [-2.0, -1, 0, 1, 2, 3, 4]
-    # lims = [-3-1, 3.]
     arrange_axis(axes, "1", "2", ticks, None, fontsize=8, xpos=0.5, ypos=0.45)
     axes.set(
         xticks=ticks,
@@ -60,6 +61,7 @@ if __name__ == "__main__":
         aspect="equal",
     )
 
+    print("Adding paths and sequence labels")
     seqs = [
         "AGGAGGUAC",
         "AGGAGGAAC",

@@ -3,16 +3,16 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
-from scipy.stats import spearmanr, norm, beta
 from scripts.figures.plot_utils import FIG_WIDTH
 
 
 if __name__ == "__main__":
-    loss = pd.read_csv("results/thermodynamic_model.ll.csv", index_col=0)
-    loss["ll"] = loss.sum(1)
+    print("Load data from thermodynamic model fit")
     td_pred = pd.read_csv("results/thermodynamic_model.pred.csv", index_col=0)
     train = pd.read_csv("processed/dmsc.train.csv", index_col=0).join(td_pred)
     test = pd.read_csv("processed/dmsc.test.csv", index_col=0).join(td_pred)
+    loss = pd.read_csv("results/thermodynamic_model.ll.csv", index_col=0)
+    loss["ll"] = loss.sum(1)
 
     fig, subplots = plt.subplots(
         1,
@@ -23,6 +23,7 @@ if __name__ == "__main__":
 
     palette = {"VC": "black", "MEI": "grey"}
 
+    print("Plotting log-likelihood during optimization")
     axes = subplots[0]
     axes.plot(loss["ll"], c="black", lw=0.75)
     axes.set(
@@ -34,6 +35,7 @@ if __name__ == "__main__":
         -0.35, 1.05, "A", fontsize=14, weight="bold", transform=axes.transAxes
     )
 
+    print("Plotting predicted vs observed phenotypes in training set")
     axes = subplots[1]
     axes.axline((0, 0), (1, 1), color="grey", linestyle="--", linewidth=0.5)
     sns.histplot(
@@ -63,6 +65,7 @@ if __name__ == "__main__":
         -0.35, 1.05, "B", fontsize=14, weight="bold", transform=axes.transAxes
     )
 
+    print("Plotting predicted vs observed phenotypes in test set")
     axes = subplots[2]
     axes.axline((0, 0), (1, 1), color="grey", linestyle="--", linewidth=0.5)
     axes.scatter(x=test["y_pred"], y=test["y"], s=5, c="black", alpha=0.3, lw=0)

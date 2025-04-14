@@ -1,12 +1,12 @@
 import gpmap.plot.ds as dplot
 import gpmap.plot.mpl as mplot
-import numpy as np
 import pandas as pd
+import matplotlib
+
 from gpmap.utils import read_edges
 from scripts.figures.plot_utils import (
     annotate_seq,
     plot_path,
-    plot_landscape,
     arrange_axis,
     plot_function_hist,
     FIG_WIDTH,
@@ -14,19 +14,16 @@ from scripts.figures.plot_utils import (
 
 
 if __name__ == "__main__":
-    import matplotlib
-
     matplotlib.use("Agg")
 
+    print("Loading input data")
     nodes_df = pd.read_parquet("results/vcregression.map.mf_2.nodes.pq")
+    edges_df = read_edges("results/edges.npz")
 
-    print(
-        "Wild-type log(GFP) = {:.2f}".format(
-            nodes_df.loc["AAGGAGGUG", "function"]
-        )
-    )
-    edges_df = read_edges("results/seqdeft.edges.npz")
+    wt = nodes_df.loc["AAGGAGGUG", "function"]
+    print("Wild-type log(GFP) = {:.2f}".format(wt))
 
+    print("Plotting VC regression visualization")
     dsg = dplot.plot_edges(nodes_df, edges_df=edges_df, resolution=800)
     fig = dplot.dsg_to_fig(dsg)
     fig.set_size_inches((FIG_WIDTH * 0.4, FIG_WIDTH * 0.4))
@@ -68,7 +65,7 @@ if __name__ == "__main__":
     )
     kwargs = {"fontsize": 7, "arrow_size": 0.35}
 
-    # Annotate corners
+    print("Adding paths and sequence labels")
     annotate_seq(
         axes,
         "UAGGAGGUA",
@@ -99,8 +96,6 @@ if __name__ == "__main__":
         va="top",
         **kwargs,
     )
-    # fig.tight_layout()
-    fig.savefig("figures/vcregression_visualization.no_paths.png", dpi=300)
 
     # Add paths and further annotations
     plot_path(axes, nodes_df, size=20, vmin=vmin, vmax=vmax)

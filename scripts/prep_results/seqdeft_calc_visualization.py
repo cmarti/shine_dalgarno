@@ -6,7 +6,7 @@ from gpmap.space import SequenceSpace
 
 
 if __name__ == "__main__":
-    for species in ['b_sub', 'e_coli']:
+    for species in ["b_sub", "e_coli"]:
         print("Loading SeqDEFT results from {}".format(species))
         fpath = "results/{}.seqdeft.map.csv".format(species)
         data = pd.read_csv(fpath, index_col=0)

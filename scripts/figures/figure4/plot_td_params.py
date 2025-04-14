@@ -1,18 +1,17 @@
 import pandas as pd
 import numpy as np
-import seaborn as sns
 import matplotlib.pyplot as plt
 import logomaker
+import matplotlib
 import torch
 
 from scripts.figures.plot_utils import FIG_WIDTH
 
 if __name__ == "__main__":
-    import matplotlib
-
     matplotlib.use("Agg")
 
-    params = torch.load("results/thermodynamic_model.pth")
+    print("Loading thermodynamic model parameters")
+    params = torch.load("results/thermodynamic_model.pth", weights_only=True)
     T = 273 + 37
     RT = 0.592 / 298 * T
     theta = (
@@ -30,6 +29,7 @@ if __name__ == "__main__":
         )
     )
 
+    print("Plotting energy logo")
     fig, axes = plt.subplots(
         1, 1, figsize=(FIG_WIDTH * 0.5 * 0.575, FIG_WIDTH * 0.19)
     )
@@ -44,5 +44,5 @@ if __name__ == "__main__":
         xticklabels=np.arange(0, m.shape[0]) + 1,
     )
     fig.tight_layout()
-    fig.savefig("figures/thermodynamic_model.params.svg", dpi=300)
-    fig.savefig("figures/thermodynamic_model.params.png", dpi=300)
+    fig.savefig("figures/thermodynamic_model_params.svg", dpi=300)
+    fig.savefig("figures/thermodynamic_model_params.png", dpi=300)

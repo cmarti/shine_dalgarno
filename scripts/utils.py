@@ -5,7 +5,7 @@ from itertools import product, combinations
 
 
 def load_experimental_data():
-    print('Loading training and test experimental data')
+    print("Loading training and test experimental data")
     train = pd.read_csv("processed/dmsc.train.csv", index_col=0)
     test = pd.read_csv("processed/dmsc.test.csv", index_col=0)
 
@@ -23,14 +23,14 @@ def load_experimental_data():
 
 
 def load_sequence_data(species):
-    print("\tLoading data")
+    print("\tLoading sequence data from {}".format(species))
     fpath = "processed/{}.seqs.txt".format(species)
     X = np.array([line.strip() for line in open(fpath)])
-    return(X)
+    return X
 
 
-def get_contrast_matrix():
-    print('Defining contrasts matrix')
+def get_contrast_matrix(seqdeft=False):
+    print("Defining contrasts matrix")
     bc1 = np.array(["".join(x) for x in product("ACGU", repeat=3)])
     bc2 = np.array(["".join(x) for x in product("ACGU", repeat=6)])
     bc3 = np.array(["".join(x) for x in product("ACGU", repeat=9)])
@@ -43,13 +43,17 @@ def get_contrast_matrix():
         "NNNAGGNNN": {"{}AGG{}".format(x[:3], x[3:]): p2 for x in bc2},
         "NNNAGGAGG": {"{}AGGAGG".format(x): p1 for x in bc1},
         "NNNNNNNNN": {x: p3 for x in bc3},
+        "AAGGAGGUG": {"AAGGAGGUG": 1.0},
     }
     contrasts_matrix1 = pd.DataFrame(contrasts).fillna(0)
-    for col in contrasts_matrix1.columns:
-        contrasts_matrix1[col] -= contrasts_matrix1["NNNNNNNNN"]
-    contrasts_matrix1.drop("NNNNNNNNN", axis=1, inplace=True)
-    
-    backgrounds = ["UUAAGGAGC", "UAAGGAGCA", "AAGGAGCAG"]
+
+    if seqdeft:
+        for col in contrasts_matrix1.columns:
+            contrasts_matrix1[col] -= contrasts_matrix1["NNNNNNNNN"]
+        contrasts_matrix1.drop("NNNNNNNNN", axis=1, inplace=True)
+        contrasts_matrix1.drop("AAGGAGGUG", axis=1, inplace=True)
+
+    backgrounds = ["UUAAGGAGC", "UAAGGAGCA"]  # , "AAGGAGCAG"
     positions = np.arange(-13, -4)
     contrasts = {}
     for bc1, bc2 in combinations(backgrounds, 2):
@@ -66,5 +70,10 @@ def get_contrast_matrix():
                 s2 = "".join(s)
                 contrasts["{}_in_{}".format(label, bc)] = {s1: -1, s2: 1}
     contrasts_matrix2 = pd.DataFrame(contrasts).fillna(0)
-    contrasts_matrix = pd.concat([contrasts_matrix1, contrasts_matrix2]).fillna(0)
-    return(contrasts_matrix)
+    contrasts_matrix = pd.concat([contrasts_matrix1, contrasts_matrix2]).fillna(
+        0
+    )
+    if seqdeft:
+        contrasts_matrix = -contrasts_matrix
+
+    return contrasts_matrix

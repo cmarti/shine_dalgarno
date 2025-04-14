@@ -1,3 +1,4 @@
+import matplotlib
 import gpmap.plot.mpl as mplot
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -12,39 +13,30 @@ from scripts.figures.plot_utils import (
 
 
 if __name__ == "__main__":
-    import matplotlib
-
     matplotlib.use("Agg")
 
     mfs = [1, 1.5, 2, 2.5]
     lims = (-4.5, 5.0)
     ticks = [-4, -3, -2, 1, 0, 1, 2, 3, 4]
     nplots = len(mfs)
-    edges_df = read_edges("results/seqdeft.edges.npz")
-    nodes_df = {
-        mf: pd.read_parquet(
-            "results/vcregression.map.mf_{}.nodes.pq".format(mf)
-        )
-        for mf in mfs
-    }
 
-    # print('Plotting edges')
-    # dsg = dplot.plot_edges(nodes_df[mfs[0]], edges_df=edges_df, resolution=800)
-    # for mf in mfs[1:]:
-    #     dsg += dplot.plot_edges(nodes_df[mf], edges_df=edges_df, resolution=800)
+    print("Load input data")
+    edges_df = read_edges("results/edges.npz")
+    fname = "results/vcregression.map.mf_{}.nodes.pq"
+    nodes_df = {mf: pd.read_parquet(fname.format(mf)) for mf in mfs}
 
-    # fig = dplot.dsg_to_fig(dsg)
-    # fig.set_size_inches((FIG_WIDTH, FIG_WIDTH / nplots))
-    # subplots = fig.axes
     fig, subplots = plt.subplots(1, 4, figsize=(FIG_WIDTH, FIG_WIDTH / nplots))
     cbar_ax = subplots[1].inset_axes((-0, 0.7, 0.03, 0.3))
     vmin, vmax = 0, 3.5
     print("Plotting nodes")
     for mf, axes in zip(mfs, subplots):
+        print("\tMean function at stationarity: {:.2f}".format(mf))
         df = nodes_df[mf]
         if df.loc["AGGAGAAUA", "3"] < 0:
             df["3"] = -df["3"]
-        mplot.plot_edges(axes, df, edges_df=edges_df, alpha=0.02, rasterized=True)
+        mplot.plot_edges(
+            axes, df, edges_df=edges_df, alpha=0.02, rasterized=True
+        )
         mplot.plot_nodes(
             axes,
             df,
@@ -136,5 +128,5 @@ if __name__ == "__main__":
     )
 
     fig.tight_layout(w_pad=0.1)
-    fig.savefig("figures/vcregression.visualization.mfs.png", dpi=300)
-    fig.savefig("figures/vcregression.visualization.mfs.svg", dpi=300)
+    fig.savefig("figures/vcregression_visualization_mfs.png", dpi=300)
+    fig.savefig("figures/vcregression_visualization_mfs.svg", dpi=300)

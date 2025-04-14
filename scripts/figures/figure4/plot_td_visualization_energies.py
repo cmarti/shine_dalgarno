@@ -3,23 +3,22 @@ import gpmap.plot.mpl as mplot
 import holoviews as hv
 import pandas as pd
 import seaborn as sns
+import matplotlib
+
 from gpmap.utils import read_edges
 
 from scripts.figures.plot_utils import FIG_WIDTH
 
 if __name__ == "__main__":
-    import matplotlib
-
     matplotlib.use("Agg")
     hv.extension("matplotlib")
 
+    print("Loading data for plotting")
     energies = pd.read_csv("results/thermodynamic_model.pred.csv", index_col=0)
-    print(energies.corr())
+    nodes_df = pd.read_parquet("results/thermodynamic_model.nodes.pq")
+    nodes_df = nodes_df.join(energies)
+    edges_df = read_edges("results/edges.npz")
     min_energy = energies.min().min()
-    nodes_df = pd.read_parquet("results/thermodynamic_model.nodes.pq").join(
-        energies
-    )
-    edges_df = read_edges("results/seqdeft.edges.npz")
 
     x, y = "1", "2"
     edges_dsg = dplot.plot_edges(
@@ -29,12 +28,13 @@ if __name__ == "__main__":
     grid = hv.Layout(dsg).cols(2).opts(sublabel_format="")
     fig = dplot.dsg_to_fig(grid)
     fig.set_size_inches((FIG_WIDTH * 0.3, FIG_WIDTH * 0.5))
-    # fig.set_size_inches((FIG_WIDTH * 0.25 * 1.5, FIG_WIDTH * 0.45 * 1.5))
 
     nodes_cbar_axes = fig.axes[0].inset_axes((-0.135, 0.65, 0.035, 0.35))
     positions = [2, 5, 3, 6, 4, 1]
 
+    print("Plotting visualization of binding energies at each position")
     for i, axes in zip(positions, fig.axes):
+        print("\tPosition {}".format(i - 16))
         col = "dg{}".format(i + 1)
         nodes_df[col] = nodes_df[col] - min_energy
         mplot.plot_nodes(
@@ -43,12 +43,10 @@ if __name__ == "__main__":
             x=x,
             y=y,
             sort_by=col,
-            # sort_by="3",
             sort_ascending=False,
             color=col,
             size=1,
             cmap="Greys_r",
-            # cbar=False,
             cbar=True,
             cbar_axes=nodes_cbar_axes,
             cbar_orientation="vertical",
@@ -88,30 +86,9 @@ if __name__ == "__main__":
             transform=axes.get_xaxis_transform(),
             clip_on=False,
         )
-        # axes.annotate(
-        #     "Diffusion axis {}".format(y),
-        #     xy=(1.4, 0.98),
-        #     xycoords=("data", "axes fraction"),
-        #     textcoords="offset points",
-        #     fontsize=6,
-        #     ha="center",
-        #     va="center",
-        # )
-        # axes.annotate(
-        #     "Diffusion\naxis {}".format(x),
-        #     xy=(1.0, 0.2),
-        #     xycoords=("axes fraction", "data"),
-        #     textcoords="offset points",
-        #     fontsize=6,
-        #     ha="center",
-        #     va="bottom",
-        # )
         sns.despine(ax=axes)
 
-    # fig.subplots_adjust()
-    fig.savefig(
-        "figures/thermodynamic_model_visualization.energies.png", dpi=300
-    )
-    fig.savefig(
-        "figures/thermodynamic_model_visualization.energies.svg", dpi=600
-    )
+    fpath = "figures/thermodynamic_model_visualization_energies.png"
+    fig.savefig(fpath, dpi=300)
+    fpath = "figures/thermodynamic_model_visualization_energies.svg"
+    fig.savefig(fpath, dpi=600)

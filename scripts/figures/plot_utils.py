@@ -88,8 +88,9 @@ def annotate_seq(
     )
 
 
-def plot_path(axes, nodes, x="1", y="2", size=40, lw=1.5, seqs=None,
-              vmin=None, vmax=None):
+def plot_path(
+    axes, nodes, x="1", y="2", size=40, lw=1.5, seqs=None, vmin=None, vmax=None
+):
     if seqs is None:
         seqs = [
             "AGGAGAAUA",
@@ -332,4 +333,120 @@ def add_vcregression_labels(
             va="top",
             fontsize=fontsize,
             arrow_size=arrow_size,
+        )
+
+
+def plot_posterior(
+    axes, df, x="x", y="estimate", std="std", color="black", label=None
+):
+    kwargs = {
+        "fmt": "o",
+        "lw": 0,
+        "elinewidth": 1,
+        "capsize": 2,
+        "markersize": 2.5,
+    }
+    axes.errorbar(
+        df[x],
+        df[y],
+        yerr=2 * df[std],
+        color=color,
+        label=label,
+        **kwargs,
+    )
+
+
+def plot_mut_effs_posterior(axes, contrasts):
+    peaks_contrasts = ["in" in x for x in contrasts.index]
+    peaks_contrasts = contrasts.loc[peaks_contrasts, :].copy()
+    items = [x.split("_") for x in peaks_contrasts.index.values]
+    peaks_contrasts["mutation"] = [x[0] for x in items]
+    peaks_contrasts["background"] = [x[-1] for x in items]
+
+    bc1 = peaks_contrasts["background"] == "UUAAGGAGC"
+    df = peaks_contrasts.loc[bc1, :].copy()
+    df["x"] = np.arange(df.shape[0]) - 0.125
+    plot_posterior(
+        axes,
+        df,
+        color="grey",
+        label=r"UUA$\bf{AGGAG}$C",
+    )
+    bc2 = peaks_contrasts["background"] == "UAAGGAGCA"
+    df = peaks_contrasts.loc[bc2, :].copy()
+    df["x"] = np.arange(df.shape[0]) + 0.125
+    plot_posterior(
+        axes,
+        df,
+        color="black",
+        label=r"UA$\bf{AGGAG}$CA",
+    )
+
+    axes.set(
+        xlabel="Mutation",
+        ylabel="$\Delta$log(GFP)",
+        xticks=df["x"],
+        xticklabels=df["mutation"],
+    )
+    axes.axhline(0, linestyle="--", c="grey", lw=0.75)
+    axes.legend(loc=(-0.02, 1.025), ncol=2)
+
+
+def plot_path_posterior(axes, contrasts):
+    seqs = ["AGGAGGNNN", "NGGAGGAGN", "NNNAGGNNN", "NNNAGGAGG"]
+    labels = [
+        r"$\bf{AGGAGG}$NNN",
+        r"N$\bf{GGAGGAG}$N",
+        r"NNN$\bf{AGG}$NNN",
+        r"NNN$\bf{AGGAGG}$",
+    ]
+    path_contrasts = contrasts.loc[seqs, :].copy()
+    path_contrasts["step"] = np.arange(1, path_contrasts.shape[0] + 1)
+    plot_posterior(axes, path_contrasts, "step", "estimate", "std")
+    axes.set(
+        xlabel="Genetic background",
+        ylabel="log(GFP)",
+        xticks=path_contrasts["step"],
+        xlim=(0.5, 4.5),
+    )
+    axes.set_xticklabels(labels, rotation=45, ha="right")
+
+    if "NNNNNNNNN" in contrasts.index:
+        axes.axhline(
+            contrasts.loc["NNNNNNNNN", "estimate"],
+            linestyle="--",
+            c="grey",
+            lw=0.75,
+            label="Average",
+        )
+        axes.axhspan(
+            ymin=contrasts.loc["NNNNNNNNN", "ci_95_lower"],
+            ymax=contrasts.loc["NNNNNNNNN", "ci_95_upper"],
+            color="grey",
+            alpha=0.3,
+            lw=0,
+        )
+    else:
+        axes.axhline(
+            0.0,
+            linestyle="--",
+            c="grey",
+            lw=0.75,
+            label="Average",
+        )
+
+    if "AAGGAGGUG" in contrasts.index:
+        axes.axhline(
+            contrasts.loc["AAGGAGGUG", "estimate"],
+            linestyle="--",
+            c="grey",
+            lw=0.75,
+            label="Average",
+        )
+        axes.axhspan(
+            ymin=contrasts.loc["AAGGAGGUG", "ci_95_lower"],
+            ymax=contrasts.loc["AAGGAGGUG", "ci_95_upper"],
+            color="grey",
+            alpha=0.2,
+            lw=0,
         )

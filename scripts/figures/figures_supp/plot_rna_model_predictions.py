@@ -6,7 +6,8 @@ from scripts.figures.plot_utils import FIG_WIDTH
 
 
 if __name__ == "__main__":
-    energies = pd.read_csv("results/viennarna.pred.csv", index_col=0)
+    print("Loading data from RNA model")
+    energies = pd.read_csv("results/rna_model.pred.csv", index_col=0)
     train = pd.read_csv("processed/dmsc.train.csv", index_col=0).join(energies)
     test = pd.read_csv("processed/dmsc.test.csv", index_col=0).join(energies)
 
@@ -18,10 +19,11 @@ if __name__ == "__main__":
         sharey=True,
     )
 
+    print("Plotting predicted vs observed phenotypes in training set")
     axes = subplots[0]
     axes.axline((0, 0), (1, 1), color="grey", linestyle="--", linewidth=0.5)
     sns.histplot(
-        x=train["pred"],
+        x=train["y_pred"],
         y=train["y"],
         cmap="inferno",
         ax=axes,
@@ -35,7 +37,7 @@ if __name__ == "__main__":
         ylabel="Training measured log(GFP)",
         aspect="equal",
     )
-    r2 = np.corrcoef(train["pred"], train["y"])[0, 1] ** 2
+    r2 = np.corrcoef(train["y_pred"], train["y"])[0, 1] ** 2
     axes.text(
         0.95,
         0.05,
@@ -49,9 +51,10 @@ if __name__ == "__main__":
         -0.35, 1.05, "A", fontsize=14, weight="bold", transform=axes.transAxes
     )
 
+    print("Plotting predicted vs observed phenotypes in test set")
     axes = subplots[1]
     axes.axline((0, 0), (1, 1), color="grey", linestyle="--", linewidth=0.5)
-    axes.scatter(x=test["pred"], y=test["y"], s=5, c="black", alpha=0.3, lw=0)
+    axes.scatter(x=test["y_pred"], y=test["y"], s=5, c="black", alpha=0.3, lw=0)
     axes.set(
         xlabel="Test predicted log(GFP)",
         ylabel="Test measured log(GFP)",
@@ -59,7 +62,7 @@ if __name__ == "__main__":
         ylim=(0, 3.5),
         aspect="equal",
     )
-    r2 = np.corrcoef(test["pred"], test["y"])[0, 1] ** 2
+    r2 = np.corrcoef(test["y_pred"], test["y"])[0, 1] ** 2
     axes.text(
         0.95,
         0.05,
@@ -74,5 +77,5 @@ if __name__ == "__main__":
     )
 
     fig.tight_layout(w_pad=0)
-    fig.savefig("figures/rnamodel_pred.png", dpi=300)
-    fig.savefig("figures/rnamodel_pred.svg", dpi=600)
+    fig.savefig("figures/rna_model_pred.png", dpi=300)
+    fig.savefig("figures/rna_model_pred.svg", dpi=600)

@@ -1,3 +1,4 @@
+import matplotlib
 import gpmap.plot.ds as dplot
 import numpy as np
 import pandas as pd
@@ -11,17 +12,13 @@ from scripts.figures.plot_utils import (
 
 
 if __name__ == "__main__":
-    import matplotlib
-
     matplotlib.use("Agg")
 
+    print("Loading input data")
     seqdeft_nodes_df = pd.read_parquet("results/b_sub.seqdeft.nodes.pq")
-    print(seqdeft_nodes_df.sort_values("1"))
-    print(seqdeft_nodes_df.sort_values("2"))
+    edges_df = read_edges("results/edges.npz")
 
-    relaxation_times = pd.read_csv("results/b_sub.seqdeft.decay_rates.csv")
-    edges_df = read_edges("results/b_sub.seqdeft.edges.npz")
-
+    print("Plotting visualization")
     dsg = dplot.plot_edges(seqdeft_nodes_df, edges_df=edges_df, resolution=800)
     fig = dplot.dsg_to_fig(dsg)
     fig.set_size_inches((FIG_WIDTH * 0.6, FIG_WIDTH * 0.6))
@@ -64,8 +61,8 @@ if __name__ == "__main__":
         yticks=[-2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5],
     )
 
+    print("Adding paths and sequence labels")
     kwargs = {"fontsize": 7, "arrow_size": 0.25}
-    # Annotate corner sequences
     annotate_seq(
         axes,
         "UUAGGAGGA",
@@ -107,7 +104,9 @@ if __name__ == "__main__":
         "AGGAGGAUA",
         "AGGAGGUUA",
     ]
-    plot_path(axes, seqdeft_nodes_df, lw=1, size=20, seqs=seqs, vmin=vmin, vmax=vmax)
+    plot_path(
+        axes, seqdeft_nodes_df, lw=1, size=20, seqs=seqs, vmin=vmin, vmax=vmax
+    )
 
     seqs = [
         "UUAGGAGGA",
@@ -117,7 +116,9 @@ if __name__ == "__main__":
         "GGAGGAUUA",
         "GGAGGUUUA",
     ]
-    plot_path(axes, seqdeft_nodes_df, lw=1, size=20, seqs=seqs, vmin=vmin, vmax=vmax)
+    plot_path(
+        axes, seqdeft_nodes_df, lw=1, size=20, seqs=seqs, vmin=vmin, vmax=vmax
+    )
 
     annotate_seq(
         axes,

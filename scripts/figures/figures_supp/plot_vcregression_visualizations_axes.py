@@ -1,3 +1,4 @@
+import matplotlib
 import pandas as pd
 import seaborn as sns
 
@@ -12,13 +13,11 @@ from scripts.figures.plot_utils import (
 
 
 if __name__ == "__main__":
-    import matplotlib
-
     matplotlib.use("Agg")
 
     print("Loading VC regression visualization data")
     nodes_df = pd.read_parquet("results/vcregression.map.mf_2.nodes.pq")
-    edges_df = read_edges("results/seqdeft.edges.npz")
+    edges_df = read_edges("results/edges.npz")
 
     fig, subplots = plt.subplots(
         1, 4, figsize=(12, 3.5), gridspec_kw={"width_ratios": [1, 1, 1, 0.035]}
@@ -36,7 +35,12 @@ if __name__ == "__main__":
     for axes, (x, y, z) in zip(subplots[:3], diffusion_axes):
         print("\tDiffusion axes {} and {}".format(x, y))
         mplot.plot_edges(
-            axes, nodes_df, edges_df=edges_df, x=x, y=y, alpha=0.02,
+            axes,
+            nodes_df,
+            edges_df=edges_df,
+            x=x,
+            y=y,
+            alpha=0.02,
             rasterized=True,
         )
         mplot.plot_nodes(
@@ -99,7 +103,9 @@ if __name__ == "__main__":
             "GAGUUUGAU",
             "GAGUUUAAU",
         ]
-        plot_path(axes, nodes_df, x=x, y=y, size=20, seqs=seqs, vmin=vmin, vmax=vmax)
+        plot_path(
+            axes, nodes_df, x=x, y=y, size=20, seqs=seqs, vmin=vmin, vmax=vmax
+        )
 
         seqs = [
             "UAAGGAGCA",
@@ -110,7 +116,9 @@ if __name__ == "__main__":
             "GGAGGUUAA",
             "GGAGUUUAA",
         ]
-        plot_path(axes, nodes_df, x=x, y=y, size=20, seqs=seqs, vmin=vmin, vmax=vmax)
+        plot_path(
+            axes, nodes_df, x=x, y=y, size=20, seqs=seqs, vmin=vmin, vmax=vmax
+        )
 
     fontsize = 8
     axes = subplots[0]
@@ -405,5 +413,5 @@ if __name__ == "__main__":
     print("Saving figure")
     fig.tight_layout(w_pad=0.2)
     nodes_cbar_axes.set_position([0.925, 0.2, 0.0075, 0.6])
-    fig.savefig("figures/vcregression.visualization.axis6.png", dpi=300)
+    fig.savefig("figures/vcregression_visualization_axes.png", dpi=300)
     print("Done")

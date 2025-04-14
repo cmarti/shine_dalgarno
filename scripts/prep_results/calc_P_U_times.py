@@ -1,4 +1,3 @@
-import sys
 import numpy as np
 import pandas as pd
 import tracemalloc
@@ -16,8 +15,10 @@ def calc_Pj(n_alleles, seq_length, j):
 
 
 if __name__ == "__main__":
-    operators = {'Dense matrix': calc_Pj,
-                 'Linear Operator': VjProjectionOperator}
+    operators = {
+        "Dense matrix": calc_Pj,
+        "Linear Operator": VjProjectionOperator,
+    }
     results = []
     for alphabet, n_alleles, max_length in [
         ("dna", 4, 12),
@@ -26,14 +27,14 @@ if __name__ == "__main__":
         for seq_length in range(2, max_length + 1):
             n = int(n_alleles**seq_length)
             positions = np.arange(seq_length)
-            
+
             for label, operator in operators.items():
-                if n > 4e4 and label == 'Dense matrix':
+                if n > 4e4 and label == "Dense matrix":
                     continue
-                
+
                 for i in range(20):
                     j = positions[np.random.uniform(size=seq_length) < 0.5]
-                    
+
                     tracemalloc.start()
                     current1, peak1 = tracemalloc.get_traced_memory()
                     t0 = time()
@@ -41,7 +42,7 @@ if __name__ == "__main__":
                     t1 = time() - t0
                     current2, peak2 = tracemalloc.get_traced_memory()
                     tracemalloc.stop()
-                    
+
                     v = np.random.normal(size=n)
                     t0 = time()
                     u = Pj @ v
@@ -49,7 +50,7 @@ if __name__ == "__main__":
                     results.append(
                         {
                             "seq_length": seq_length,
-                            'n_alleles': n_alleles,
+                            "n_alleles": n_alleles,
                             "type": alphabet,
                             "operator": label,
                             "overhead_time": t1,
@@ -58,7 +59,7 @@ if __name__ == "__main__":
                             "peak_memory": (peak2 - peak1) / 1e6,
                         }
                     )
-                    print(results[-1])
-                
+                    # print(results[-1])
+
     results = pd.DataFrame(results)
-    results.to_csv("results/vjprojection_times.csv")
+    results.to_csv("results/times_P_U_operator.csv")

@@ -7,12 +7,14 @@ from scripts.figures.plot_utils import FIG_WIDTH
 
 
 if __name__ == "__main__":
-    e_coli = pd.read_csv("data/seqdeft_inference.csv", index_col=0)
-    b_sub = pd.read_csv("results/b_sub.seqdeft_inference.csv", index_col=0)
+    print("Load VC regression and SeqDEFT inferred genotype-phenotype maps")
+    e_coli = pd.read_csv("results/e_coli.seqdeft.map.csv", index_col=0)
+    b_sub = pd.read_csv("results/b_sub.seqdeft.map.csv", index_col=0)
 
     x = np.log10(e_coli["Q_star"])
     y = np.log10(b_sub["Q_star"])
 
+    print("Plot comparison of the two genotype-phenotype maps")
     fig, axes = plt.subplots(
         1,
         1,

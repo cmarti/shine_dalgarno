@@ -7,14 +7,14 @@ from scripts.figures.plot_utils import FIG_WIDTH
 
 
 if __name__ == "__main__":
-    seqdeft = pd.read_csv("results/seqdeft.full.csv", index_col=0)
-    vcregression = pd.read_csv("results/vcregression.full.csv", index_col=0)
+    print("Loading input data")
+    seqdeft = pd.read_csv("results/e_coli.seqdeft.map.csv", index_col=0)
+    vcregression = pd.read_csv("results/vcregression.map.csv", index_col=0)
 
     x = np.log10(seqdeft["Q_star"]).values
-    y = vcregression["y"].values
-    print(x)
-    print(y)
+    y = vcregression["f"].values
 
+    print("Plotting SeqDEFT vs VC regression genotype-phenotype maps")
     fig, axes = plt.subplots(
         1,
         1,

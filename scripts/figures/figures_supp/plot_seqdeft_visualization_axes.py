@@ -1,3 +1,4 @@
+import matplotlib
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -13,13 +14,11 @@ from scripts.figures.plot_utils import (
 
 
 if __name__ == "__main__":
-    import matplotlib
-
     matplotlib.use("Agg")
 
     print("Loading SeqDEFT visualization data")
-    seqdeft_nodes_df = pd.read_parquet("results/seqdeft.nodes.pq")
-    edges_df = read_edges("results/seqdeft.edges.npz")
+    seqdeft_nodes_df = pd.read_parquet("results/e_coli.seqdeft.map.nodes.pq")
+    edges_df = read_edges("results/edges.npz")
 
     fig, subplots = plt.subplots(
         1, 4, figsize=(12, 3.5), gridspec_kw={"width_ratios": [1, 1, 1, 0.035]}
@@ -113,7 +112,9 @@ if __name__ == "__main__":
         sns.despine(ax=axes)
 
         axes.set(aspect="equal")
-        plot_path(axes, seqdeft_nodes_df, x=x, y=y, size=30, vmin=vmin, vmax=vmax)
+        plot_path(
+            axes, seqdeft_nodes_df, x=x, y=y, size=30, vmin=vmin, vmax=vmax
+        )
         seqs = [
             "UAAGGAGCA",
             "UGAGGAGCA",
@@ -121,7 +122,16 @@ if __name__ == "__main__":
             "GGAGGAGUA",
             "GGAGGAAUA",
         ]
-        plot_path(axes, seqdeft_nodes_df, x=x, y=y, size=30, seqs=seqs, vmin=vmin, vmax=vmax)
+        plot_path(
+            axes,
+            seqdeft_nodes_df,
+            x=x,
+            y=y,
+            size=30,
+            seqs=seqs,
+            vmin=vmin,
+            vmax=vmax,
+        )
 
     fontsize = 8
     axes = subplots[0]
@@ -341,5 +351,5 @@ if __name__ == "__main__":
     print("Saving figure")
     fig.tight_layout()
     nodes_cbar_axes.set_position([0.9, 0.2, 0.0075, 0.6])
-    fig.savefig("figures/seqdeft.visualization.axis3.png", dpi=300)
+    fig.savefig("figures/e_coli.seqdeft_visualization_axis3.png", dpi=300)
     print("Done")

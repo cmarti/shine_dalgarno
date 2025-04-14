@@ -1,6 +1,8 @@
 import gpmap.plot.ds as dplot
 import numpy as np
 import pandas as pd
+import matplotlib
+
 from gpmap.utils import read_edges
 from scripts.figures.plot_utils import (
     annotate_seq,
@@ -12,18 +14,13 @@ from scripts.figures.plot_utils import (
 
 
 if __name__ == "__main__":
-    import matplotlib
-
     matplotlib.use("Agg")
+    print("Loading input data")
+    seqdeft_nodes_df = pd.read_parquet("results/e_coli.seqdeft.map.nodes.pq")
+    relaxation_times = pd.read_csv("results/e_coli.seqdeft.map.decay_rates.csv")
+    edges_df = read_edges("results/edges.npz")
 
-    seqdeft_nodes_df = pd.read_parquet("results/seqdeft.nodes.pq")
-
-    # print(seqdeft_nodes_df.loc[[x.startswith('GGAGG') for x in seqdeft_nodes_df.index], :].sort_values('function').tail(20))
-    # exit()
-
-    relaxation_times = pd.read_csv("results/seqdeft.decay_rates.csv")
-    edges_df = read_edges("results/seqdeft.edges.npz")
-
+    print("Plotting visualization")
     dsg = dplot.plot_edges(seqdeft_nodes_df, edges_df=edges_df, resolution=1200)
     fig = dplot.dsg_to_fig(dsg)
     fig.set_size_inches((FIG_WIDTH * 0.66, FIG_WIDTH * 0.66))
@@ -41,6 +38,7 @@ if __name__ == "__main__":
     )
     axes.set(aspect="equal")
 
+    print("Adding paths and sequence labels")
     times_axes = axes.inset_axes((0.825, 0.8, 0.225, 0.175))
     plot_relaxation_times(relaxation_times, times_axes)
     plot_path(axes, seqdeft_nodes_df, size=30, vmin=vmin, vmax=vmax)
@@ -139,6 +137,7 @@ if __name__ == "__main__":
         fontsize=fontsize,
     )
 
+    print("Rendering plot")
     fig.tight_layout()
     fig.savefig("figures/seqdeft_visualization.png", dpi=300)
     fig.savefig("figures/seqdeft_visualization.svg", dpi=600)

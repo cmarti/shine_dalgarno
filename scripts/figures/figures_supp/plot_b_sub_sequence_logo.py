@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import seaborn as sns
 import logomaker
 import matplotlib.pyplot as plt
 from scripts.figures.plot_utils import FIG_WIDTH
@@ -14,13 +13,8 @@ if __name__ == "__main__":
     sd_start = upstream_bases - distance_start_codon - seq_length
 
     print("Loading data")
-    gene_data = pd.read_csv(
-        "data/{}.gene_5utr.csv".format(species), index_col=0
-    )
-    background_seqs = [
-        x[: upstream_bases + 3] for x in gene_data["background"]
-    ]
-    print(len(background_seqs[0]))
+    gene_data = pd.read_csv("processed/b_sub.gene_5utr.csv", index_col=0)
+    background_seqs = [x[: upstream_bases + 3] for x in gene_data["background"]]
 
     print("Computing allele frequencies")
     allele_freqs = logomaker.alignment_to_matrix(
@@ -28,9 +22,7 @@ if __name__ == "__main__":
     )
 
     print("Plotting logo")
-    fig, axes = plt.subplots(
-        1, 1, figsize=(FIG_WIDTH * 0.6, FIG_WIDTH * 0.14)
-    )
+    fig, axes = plt.subplots(1, 1, figsize=(FIG_WIDTH * 0.6, FIG_WIDTH * 0.14))
     logo = logomaker.Logo(allele_freqs, ax=axes, color_scheme="classic")
     for p in list(range(sd_start)) + list(range(sd_start + seq_length, 20)):
         for c in "AUGC":

@@ -18,27 +18,29 @@ if __name__ == "__main__":
     y1, y2, y3 = 0.965, 0.64, 0.34
 
     print("Loading data")
-    dcor = pd.read_csv(
-        "results/dmsc.empirical_distance_correlation.csv", index_col=0
-    )
-    vc = pd.read_csv("results/vc.prior_variance_components.csv", index_col=0)
-    map_vc = pd.read_csv(
-        "results/vcregression.map_variance_components.csv", index_col=0
-    )
+    fpath = "results/dmsc.empirical_distance_correlation.csv"
+    dcor = pd.read_csv(fpath, index_col=0)
+
+    fpath = "results/vcregression.variance_components.csv"
+    vc = pd.read_csv(fpath, index_col=0).drop(0, axis=0)
+
+    fpath = "results/vcregression.map.variance_components.csv"
+    map_vc = pd.read_csv(fpath, index_col=0)
+
     train = pd.read_csv("processed/dmsc.train.csv", index_col=0)
     test = pd.read_csv("processed/dmsc.test.csv", index_col=0)
 
-    full = pd.read_csv("results/vcregression.full.csv", index_col=0)
-    pred = pd.read_csv("results/vcregression.test.csv", index_col=0)
-    test = test.join(pred, rsuffix="_pred")
-    train = train.join(full, rsuffix="_pred")
+    map = pd.read_csv("results/vcregression.map.csv", index_col=0)
+    pred = pd.read_csv("results/vcregression.test_pred.csv", index_col=0)
 
-    marginal_sites = pd.read_csv(
-        "results/vcregression.map_site_marginal_epistasis.csv", index_col=0
-    )
-    marginal_pw = pd.read_csv(
-        "results/vcregression.map_pairwise_marginal_epistasis.csv", index_col=0
-    )
+    test = test.join(pred, rsuffix="_pred")
+    train = train.join(map, rsuffix="_pred")
+
+    fpath = "results/vcregression.map.site_marginal_epistasis.csv"
+    marginal_sites = pd.read_csv(fpath, index_col=0)
+
+    fpath = "results/vcregression.map.pairwise_marginal_epistasis.csv"
+    marginal_pw = pd.read_csv(fpath, index_col=0)
 
     fig = plt.figure(figsize=(FIG_WIDTH * 0.55, 0.6 * FIG_WIDTH))
     gs = gs.GridSpec(3, 4, width_ratios=[1, 0.05, 1, 0.05])
@@ -61,7 +63,7 @@ if __name__ == "__main__":
 
     print("Plotting prior variance components")
     axes = fig.add_subplot(gs[0, 2])
-    axes.bar(x=vc["k"], height=vc["variance_perc"], color="black")
+    axes.bar(x=vc["k"], height=100 * vc["var_perc"], color="black")
     axes.set(
         xlabel="Interaction order $k$",
         ylabel="% variance explained",
@@ -70,8 +72,8 @@ if __name__ == "__main__":
     )
 
     axes = axes.twinx()
-    axes.scatter(vc["k"], np.cumsum(vc["variance_perc"]), color="grey", s=5)
-    axes.plot(vc["k"], np.cumsum(vc["variance_perc"]), color="grey", lw=1)
+    axes.scatter(vc["k"], 100 * vc["var_perc_cum"], color="grey", s=5)
+    axes.plot(vc["k"], 100 * vc["var_perc_cum"], color="grey", lw=1)
     axes.tick_params(axis="y", colors="grey")
     axes.spines["right"].set_color("grey")
     axes.set(ylim=(0, 105))
@@ -83,9 +85,9 @@ if __name__ == "__main__":
     print("Plotting predicted vs. observed in training set")
     axes = fig.add_subplot(gs[1, 0])
     cbar_axes1 = fig.add_subplot(gs[1, 1])
-    lims = (full["y"].min() - 0.5, full["y"].max() + 0.5)
+    lims = (map["f"].min() - 0.5, map["f"].max() + 0.5)
     bins = np.linspace(lims[0], lims[-1], 100)
-    x, y = train["y_pred"], train["y"]
+    x, y = train["f"], train["y"]
     r2 = pearsonr(x, y)[0] ** 2
     sns.histplot(
         x=x,
@@ -129,12 +131,9 @@ if __name__ == "__main__":
 
     print("Plotting predicted vs. observed in test set")
     axes = fig.add_subplot(gs[1, 2])
-    predictive_std = np.sqrt(test["y_var_pred"])
-    x, xerr = test["y_pred"], 2 * predictive_std
+    x, xerr = test["f"], 2 * test["f_std"]
     y, yerr = test["y"], 2 * np.sqrt(test["y_var"])
     r2 = pearsonr(y, x)[0] ** 2
-    lower = test["y_pred"] - 2 * predictive_std
-    upper = test["y_pred"] + 2 * predictive_std
 
     axes.errorbar(
         x,
@@ -257,7 +256,6 @@ if __name__ == "__main__":
         pos.p1[0] -= 0.105
         cbar_axes.set_position(pos)
         sns.despine(ax=cbar_axes, top=False, right=False)
-    cbar_axes1.set_yticklabels([0, 5, 10, 15, 20])
-    # cbar_axes2.set_yticks([0, 5, 10, 15, 20])
-    # fig.subplots_adjust(right=0.95)
+
+    cbar_axes1.set_yticks([0, 5, 10, 15, 20])
     fig.savefig("figures/figure2.png", dpi=300)
