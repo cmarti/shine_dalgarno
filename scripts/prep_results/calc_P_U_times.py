@@ -24,7 +24,9 @@ if __name__ == "__main__":
         ("dna", 4, 12),
         ("protein", 20, 5),
     ]:
+        print("Computing matrix-vector products in {} space".format(alphabet))
         for seq_length in range(2, max_length + 1):
+            print("\tSequence length = {}".format(seq_length))
             n = int(n_alleles**seq_length)
             positions = np.arange(seq_length)
 
