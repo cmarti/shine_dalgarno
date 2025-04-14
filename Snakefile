@@ -514,7 +514,7 @@ rule plot_b_sub_visualization:
     conda:
         "sd"
     shell:
-        "source activate.sh ; python scripts/figures/figures_supp/plot_b_sub_sequence_logo.py"
+        "source activate.sh ; python scripts/figures/figures_supp/plot_b_sub_visualization.py"
 
 rule plot_seqdeft_species_comparison:
     input:
