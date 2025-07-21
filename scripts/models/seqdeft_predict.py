@@ -1,6 +1,6 @@
 import numpy as np
 
-from scripts.utils import get_sequence_data
+from scripts.utils import load_sequence_data
 from gpmap.inference import SeqDEFT
 
 
@@ -8,7 +8,7 @@ if __name__ == "__main__":
     for species in ["b_sub", "e_coli"]:
         print("Computing Maximum a Posteriori from {} genome".format(species))
         print("\tLoading data")
-        X = get_sequence_data(species)
+        X = load_sequence_data(species)
 
         print("\tLoading hyperparameter 'a'")
         a = np.load("results/{}.seqdeft.a.npy".format(species))
