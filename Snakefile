@@ -285,8 +285,8 @@ rule calc_r2_curves:
 
 rule seqdeft_fit:
     input: 
-        "processed/e_coli.seqs.csv",
-        "processed/b_sub.seqs.csv",
+        "processed/e_coli.seqs.txt",
+        "processed/b_sub.seqs.txt",
     output:
         "results/e_coli.seqdeft.a.npy",
         "results/b_sub.seqdeft.a.npy",
@@ -299,8 +299,8 @@ rule seqdeft_fit:
 
 rule seqdeft_predict:
     input: 
-        "processed/e_coli.seqs.csv",
-        "processed/b_sub.seqs.csv",
+        "processed/e_coli.seqs.txt",
+        "processed/b_sub.seqs.txt",
         "results/e_coli.seqdeft.a.npy",
         "results/b_sub.seqdeft.a.npy",
     output:
@@ -313,8 +313,8 @@ rule seqdeft_predict:
 
 rule seqdeft_contrast:
     input: 
-        "processed/e_coli.seqs.csv",
-        "processed/b_sub.seqs.csv",
+        "processed/e_coli.seqs.txt",
+        "processed/b_sub.seqs.txt",
         "results/e_coli.seqdeft.a.npy",
         "results/b_sub.seqdeft.a.npy",
     output:
@@ -332,6 +332,8 @@ rule seqdeft_calc_visualization:
     output:
         "results/e_coli.seqdeft.map.nodes.pq",
         "results/b_sub.seqdeft.map.nodes.pq",
+        "results/e_coli.seqdeft.map.decay_rates.csv",
+        "results/b_sub.seqdeft.map.decay_rates.csv"
     conda: 
         "sd"
     shell:
@@ -377,9 +379,9 @@ rule calc_variance_components:
 rule plot_figure1:
     input:
         "processed/e_coli.gene_5utr.csv",
-        "processed/e_coli.seqs.csv",
-        "processed/e_coli.seqdeft.map.csv",
-        "processed/e_coli.seqdeft.cv_results.csv",
+        "processed/e_coli.seqs.txt",
+        "results/e_coli.seqdeft.map.csv",
+        "results/e_coli.seqdeft.cv_results.csv",
     output:
         "figures/figure1.png"
     conda: 
@@ -390,7 +392,7 @@ rule plot_figure1:
 rule plot_figure2:
     input:
         "results/dmsc.empirical_distance_correlation.csv",
-        "results/vc.prior_variance_components.csv",
+        "results/vcregression.variance_components.csv",
         "results/vcregression.map_variance_components.csv",
         "processed/dmsc.train.csv",
         "processed/dmsc.test.csv",
@@ -430,7 +432,7 @@ rule plot_seqdeft_vcregression_comparison:
 
 rule plot_vcregression_visualization:
     input:
-        "results/vcregression.map.mf_2.nodes.pq",
+        "results/vcregression.map.mf_2.0.nodes.pq",
         "results/edges.npz",
     output:
         "figures/vcregression_visualization.svg"
@@ -506,7 +508,7 @@ rule plot_b_sub_sequence_logo:
   
 rule plot_b_sub_visualization:
     input:
-        "results/b_sub.seqdeft.nodes.pq",
+        "results/b_sub.seqdeft.map.nodes.pq",
         "results/edges.npz"
     output:
         "figures/b_sub.seqdeft_visualization.png",
@@ -563,10 +565,10 @@ rule plot_P_U_benchmark:
 
 rule plot_mave_predictions:
     input:
-        "results/r2.csv",
+        "results/models.r2.csv",
         "processed/dmsc.test.csv",
         "results/vcregression.test_pred.csv",
-        "results/mei.test.csv",
+        "results/mei.test_pred.csv",
     output:
         "figures/mave_predictions.png",
         "figures/mave_predictions.svg",
@@ -588,9 +590,9 @@ rule plot_seqdeft_visualization_axes:
 
 rule plot_vcregression_visualization_mean_functions:
     input:
-        "results/vcregression.map.mf_1.nodes.pq",
+        "results/vcregression.map.mf_1.0.nodes.pq",
         "results/vcregression.map.mf_1.5.nodes.pq",
-        "results/vcregression.map.mf_2.nodes.pq",
+        "results/vcregression.map.mf_2.0.nodes.pq",
         "results/vcregression.map.mf_2.5.nodes.pq",
         "results/edges.npz",
     output:
@@ -602,7 +604,7 @@ rule plot_vcregression_visualization_mean_functions:
 
 rule plot_vcregression_visualization_axes:
     input:
-        "results/vcregression.map.mf_2.nodes.pq",
+        "results/vcregression.map.mf_2.0.nodes.pq",
         "results/edges.npz",
     output:
         "figures/vcregression_visualization_axes.png",
