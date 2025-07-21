@@ -33,7 +33,7 @@ filelock==3.16.1
 fonttools==4.57.0
 fqdn==1.5.1
 fsspec==2025.3.0
-gpmap_tools @ file:///home/martigo/elzar/programs/gpmap_tools
+gpmap_tools==0.3.2
 h11==0.14.0
 holoviews==1.17.1
 httpcore==1.0.8
