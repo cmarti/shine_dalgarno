@@ -27,8 +27,6 @@ conda create -n sd python=3.8 bioconda::viennarna
 
 Activate the newly created environment and install additional Python dependencies provided in the `requirements.txt` file with the specific versions used in the original analysis:
 
-> **Note:** Update this section upon the release of a new version of `gpmap-tools`.
-
 ```bash
 conda activate sd
 pip install -r requirements.txt
