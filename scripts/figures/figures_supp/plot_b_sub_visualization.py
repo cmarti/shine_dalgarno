@@ -15,7 +15,7 @@ if __name__ == "__main__":
     matplotlib.use("Agg")
 
     print("Loading input data")
-    seqdeft_nodes_df = pd.read_parquet("results/b_sub.seqdeft.nodes.pq")
+    seqdeft_nodes_df = pd.read_parquet("results/b_sub.seqdeft.map.nodes.pq")
     edges_df = read_edges("results/edges.npz")
 
     print("Plotting visualization")
