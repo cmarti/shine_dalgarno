@@ -1,1 +1,1 @@
-export PYTHONPATH=/home/martigo/elzar/projects/shine_dalgarno
+export PYTHONPATH=`pwd`
