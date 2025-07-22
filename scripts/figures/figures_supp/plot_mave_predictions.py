@@ -56,7 +56,7 @@ def plot_model_calibration(axes, calibration, color, label):
 
 if __name__ == "__main__":
     print("Loading input data")
-    r2 = pd.read_csv("results/r2.csv", index_col=0)
+    r2 = pd.read_csv("results/models.r2.csv", index_col=0)
     test = pd.read_csv("processed/dmsc.test.csv", index_col=0)
     vc_pred = pd.read_csv("results/vcregression.test_pred.csv", index_col=0)
     mei_pred = pd.read_csv("results/mei.test_pred.csv", index_col=0)

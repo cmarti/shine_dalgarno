@@ -11,7 +11,7 @@ import gpmap.plot.mpl as mplot
 
 if __name__ == "__main__":
     results = []
-    for alphabet, max_length in [("dna", 12), ("protein", 5)]:
+    for alphabet, max_length in [("dna", 9), ("protein", 4)]:
         for seq_length in range(1, max_length + 1):
             lambdas = np.geomspace(0.001, 10, seq_length + 1)[::-1]
             model = VCregression(

@@ -187,9 +187,9 @@ rule vc_calc_visualization:
     input: 
         "results/vcregression.map.csv",
     output:
-        "results/vcregression.map.mf_1.0.nodes.pq",
+        "results/vcregression.map.mf_1.nodes.pq",
         "results/vcregression.map.mf_1.5.nodes.pq",
-        "results/vcregression.map.mf_2.0.nodes.pq",
+        "results/vcregression.map.mf_2.nodes.pq",
         "results/vcregression.map.mf_2.5.nodes.pq"
     conda: 
         "sd"
@@ -432,7 +432,7 @@ rule plot_seqdeft_vcregression_comparison:
 
 rule plot_vcregression_visualization:
     input:
-        "results/vcregression.map.mf_2.0.nodes.pq",
+        "results/vcregression.map.mf_2.nodes.pq",
         "results/edges.npz",
     output:
         "figures/vcregression_visualization.svg"
@@ -590,9 +590,9 @@ rule plot_seqdeft_visualization_axes:
 
 rule plot_vcregression_visualization_mean_functions:
     input:
-        "results/vcregression.map.mf_1.0.nodes.pq",
+        "results/vcregression.map.mf_1.nodes.pq",
         "results/vcregression.map.mf_1.5.nodes.pq",
-        "results/vcregression.map.mf_2.0.nodes.pq",
+        "results/vcregression.map.mf_2.nodes.pq",
         "results/vcregression.map.mf_2.5.nodes.pq",
         "results/edges.npz",
     output:
@@ -604,7 +604,7 @@ rule plot_vcregression_visualization_mean_functions:
 
 rule plot_vcregression_visualization_axes:
     input:
-        "results/vcregression.map.mf_2.0.nodes.pq",
+        "results/vcregression.map.mf_2.nodes.pq",
         "results/edges.npz",
     output:
         "figures/vcregression_visualization_axes.png",
