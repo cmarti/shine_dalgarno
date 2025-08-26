@@ -259,3 +259,4 @@ if __name__ == "__main__":
 
     cbar_axes1.set_yticks([0, 5, 10, 15, 20])
     fig.savefig("figures/figure2.png", dpi=300)
+    fig.savefig("figures/figure2.svg", dpi=300)
