@@ -435,13 +435,28 @@ def plot_path_posterior(axes, contrasts):
             label="Average",
         )
 
-    if "AAGGAGGUG" in contrasts.index:
+    if "freqs" in contrasts.index:
+        axes.axhline(
+            contrasts.loc["freqs", "estimate"],
+            linestyle="--",
+            c="black",
+            lw=0.75,
+            label="AAGGAGGUG",
+        )
+        axes.axhspan(
+            ymin=contrasts.loc["freqs", "ci_95_lower"],
+            ymax=contrasts.loc["freqs", "ci_95_upper"],
+            color="grey",
+            alpha=0.2,
+            lw=0,
+        )
+    elif "AAGGAGGUG" in contrasts.index:
         axes.axhline(
             contrasts.loc["AAGGAGGUG", "estimate"],
             linestyle="--",
-            c="grey",
+            c="black",
             lw=0.75,
-            label="Average",
+            label="AAGGAGGUG",
         )
         axes.axhspan(
             ymin=contrasts.loc["AAGGAGGUG", "ci_95_lower"],
