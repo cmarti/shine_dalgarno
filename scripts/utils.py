@@ -29,7 +29,7 @@ def load_sequence_data(species):
     return X
 
 
-def get_contrast_matrix(seqdeft=False):
+def get_contrast_matrix(seqdeft=False, obs=None):
     print("Defining contrasts matrix")
     bc1 = np.array(["".join(x) for x in product("ACGU", repeat=3)])
     bc2 = np.array(["".join(x) for x in product("ACGU", repeat=6)])
@@ -42,16 +42,21 @@ def get_contrast_matrix(seqdeft=False):
         "NGGAGGAGN": {"{}GGAGGAG{}".format(x[0], x[-1]): p4 for x in bc4},
         "NNNAGGNNN": {"{}AGG{}".format(x[:3], x[3:]): p2 for x in bc2},
         "NNNAGGAGG": {"{}AGGAGG".format(x): p1 for x in bc1},
-        "NNNNNNNNN": {x: p3 for x in bc3},
         "AAGGAGGUG": {"AAGGAGGUG": 1.0},
+        "NNNNNNNNN": {x: p3 for x in bc3},
     }
     contrasts_matrix1 = pd.DataFrame(contrasts).fillna(0)
 
+    if obs is not None:
+        contrasts_matrix1 = contrasts_matrix1.join(obs)
+
     if seqdeft:
         for col in contrasts_matrix1.columns:
-            contrasts_matrix1[col] -= contrasts_matrix1["NNNNNNNNN"]
+            if col == "NNNNNNNNN":
+                continue
+            contrasts_matrix1[col] -= contrasts_matrix1["NNNNNNNNN"].values
         contrasts_matrix1.drop("NNNNNNNNN", axis=1, inplace=True)
-        contrasts_matrix1.drop("AAGGAGGUG", axis=1, inplace=True)
+        # contrasts_matrix1.drop("AAGGAGGUG", axis=1, inplace=True)
 
     backgrounds = ["UUAAGGAGC", "UAAGGAGCA"]  # , "AAGGAGCAG"
     positions = np.arange(-13, -4)
