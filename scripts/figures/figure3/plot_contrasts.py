@@ -36,7 +36,8 @@ if __name__ == "__main__":
     axes = subplots[1]
     plot_path_posterior(axes, seqdeft_contrasts)
     axes.set(
-        ylabel="Scaled selection coefficient\n relative to sequence average",
+        ylabel="Scaled selection coefficient\n relative to average sequence",
+        # ylim=(None, 7.5),
     )
     axes.text(
         -0.6, panely, "E", fontsize=14, weight="bold", transform=axes.transAxes
