@@ -29,7 +29,7 @@ if __name__ == "__main__":
     axes = subplots[1]
     plot_path_posterior(axes, contrasts)
     axes.set(
-        ylabel="Scaled selection coefficient\n relative to sequence average",
+        ylabel="Scaled selection coefficient\n relative to average sequence",
     )
 
     fig.tight_layout(w_pad=1.5)
