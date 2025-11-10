@@ -183,19 +183,20 @@ if __name__ == "__main__":
     marginal_sites.index = pos_labels
     label = "% variance explained by\n interactions involving site $i$"
     sns.heatmap(
-        marginal_sites.T.iloc[::-1, :] * 100,
+        marginal_sites.T.iloc[::-1, :],
         ax=axes,
         cmap="Greys",
         cbar_ax=cbar_axes2,
         cbar_kws={"label": label, "shrink": 0.8},
         vmin=0,
-        vmax=20,
+        vmax=15,
     )
     sns.despine(ax=axes, top=False, right=False)
     axes.set(
         ylabel="Order of interaction $k$", xlabel="Position $i$ relative to AUG"
     )
     axes.set_xticklabels(axes.get_xticklabels(), rotation=90)
+    cbar_axes2.set_yticks([0, 5, 10, 15])
     axes.text(
         x1, y3, "E", fontsize=10, weight="bold", transform=fig.transFigure
     )
@@ -206,21 +207,15 @@ if __name__ == "__main__":
     axes = fig.add_subplot(gs[2, 2])
     cbar_axes3 = fig.add_subplot(gs[2, 3])
     label = "% pairwise and higher order\nvariance explained by\n interactions involving $i,j$"
-    marginal_pw["high_order"] = marginal_pw["sum"] - marginal_pw["2"]
-    df1 = (
-        pd.pivot_table(marginal_pw, index="i", columns="j", values="2").fillna(
-            0
-        )
-        / map_vc["vc"].loc[2]
-        * 100
-    )
-    df2 = (
-        pd.pivot_table(
-            marginal_pw, index="i", columns="j", values="high_order"
-        ).fillna(0)
-        / map_vc["vc"][1:].sum()
-        * 100
-    )
+    df1 = pd.pivot_table(
+        marginal_pw, index="site1", columns="site2", values="variance_pw_perc"
+    ).fillna(0)
+    df2 = pd.pivot_table(
+        marginal_pw,
+        index="site1",
+        columns="site2",
+        values="variance_high_order_perc",
+    ).fillna(0)
 
     m = np.zeros((9, 9))
     m[:-1, 1:] = df2.values
@@ -233,7 +228,7 @@ if __name__ == "__main__":
         cmap="Greys",
         cbar_kws={"label": label, "shrink": 0.8},
         vmin=0,
-        vmax=20,
+        vmax=30,
         cbar_ax=cbar_axes3,
     )
     sns.despine(ax=axes, top=False, right=False)
@@ -257,6 +252,7 @@ if __name__ == "__main__":
         cbar_axes.set_position(pos)
         sns.despine(ax=cbar_axes, top=False, right=False)
 
-    cbar_axes1.set_yticks([0, 5, 10, 15, 20])
-    fig.savefig("figures/figure2.png", dpi=300)
+    cbar_axes1.set_yticks([0, 5000, 10000, 15000, 20000])
+    cbar_axes1.set_yticklabels([0, 5, 10, 15, 20])
+    fig.savefig("figures/figure2.jpg", dpi=600)
     fig.savefig("figures/figure2.svg", dpi=300)

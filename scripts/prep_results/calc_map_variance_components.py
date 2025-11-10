@@ -1,60 +1,40 @@
 import numpy as np
 import pandas as pd
 
-from collections import defaultdict
-from itertools import combinations
-
-from gpmap.linop import calc_vjs_variance_components
-
-
-def calc_variance_components(f):
-    vc = defaultdict(lambda: 0)
-    marginal_sites = {}
-    marginal_pw = {}
-    total_variance = np.sum((f - f.mean()) ** 2)
-    for k in range(1, 10):
-        m_j = 3**k
-        vjs_k = defaultdict(lambda: 0)
-        site_k = defaultdict(lambda: 0)
-        vjs = calc_vjs_variance_components(f, a=4, sl=9, k=k)
-
-        for j, lambda_j in vjs.items():
-            vc[k] += lambda_j * m_j / total_variance
-
-            for site in j:
-                site_k[site] += lambda_j * m_j / total_variance
-
-            if k > 1:
-                for a, b in combinations(j, 2):
-                    vjs_k[(a, b)] += lambda_j * m_j / total_variance
-
-        if k > 1:
-            marginal_pw[k] = vjs_k
-        marginal_sites[k] = site_k
-
-    marginal_pw = pd.DataFrame(marginal_pw).reset_index()
-    cols = list(range(2, 10))
-    marginal_pw.columns = ["i", "j"] + cols
-    marginal_pw["sum"] = marginal_pw[cols].sum(1)
-    marginal_sites = pd.DataFrame(marginal_sites)
-    vc = pd.DataFrame({"vc": pd.Series(vc)})
-
-    return vc, marginal_sites, marginal_pw
-
+from gpmap.summary import GPmapSummarizer
 
 if __name__ == "__main__":
     print("Loading MAP estimates")
     data = pd.read_csv("results/vcregression.map.csv", index_col=0)
+    sd_map = GPmapSummarizer(4, 9, f=data["f"].values)
 
-    print("Computing variance components in VC regression MAP")
-    vc, marginal_sites, marginal_pw = calc_variance_components(data["f"])
+    rmsme = sd_map.calc_root_mean_squared_epistatic_coeff(P=1)
+    rmsec = sd_map.calc_root_mean_squared_epistatic_coeff(P=2)
+    print("Root mean squared epistatic coefficient {:.2f}".format(rmsec))
+    print("Root mean squared mutational effect {:.2f}".format(rmsme))
 
-    print("Storing variance components calculations")
-    fpath = "results/vcregression.map.variance_components.csv"
-    vc.to_csv(fpath)
+    print("Computing V_k variance components in VC regression MAP")
+    v_k_vcs = sd_map.calc_V_k_variance_components()
+    v_k_vcs.to_csv("results/vcregression.map.variance_components.csv")
 
-    fpath = "results/vcregression.map.pairwise_marginal_epistasis.csv"
-    marginal_pw.to_csv(fpath)
+    print("Computing V_U variance components in VC regression MAP")
+    v_u_vcs = sd_map.calc_V_U_variance_components()
 
-    fpath = "results/vcregression.map.site_marginal_epistasis.csv"
-    marginal_sites.to_csv(fpath)
+    print("Computing site-marginal variance components in VC regression MAP")
+    sites = sd_map.calc_sites_variance_perc(v_u_vcs).T
+    sites.to_csv("results/vcregression.map.site_marginal_epistasis.csv")
+
+    print("Computing site-pairs variance components in VC regression MAP")
+    pairs = sd_map.calc_site_pairs_variance_perc(v_u_vcs)
+    pw_v_u_vcs = v_u_vcs.loc[v_u_vcs["k"] == 2, :]
+    pairs_pw = sd_map.calc_site_pairs_variance_perc(pw_v_u_vcs)
+    pairs_high_order = sd_map.calc_site_pairs_variance_perc(v_u_vcs, min_k=3)
+    pairs["variance_pw"] = pairs_pw["variance"]
+    pairs["variance_pw_perc"] = pairs_pw["variance_perc"]
+    pairs["variance_high_order"] = pairs_high_order["variance"]
+    pairs["variance_high_order_perc"] = pairs_high_order["variance_perc"]
+    # Ensure calculations match
+    assert np.allclose(
+        pairs["variance_pw"] + pairs["variance_high_order"], pairs["variance"]
+    )
+    pairs.to_csv("results/vcregression.map.pairwise_marginal_epistasis.csv")
