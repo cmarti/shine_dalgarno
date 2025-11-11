@@ -157,5 +157,5 @@ if __name__ == "__main__":
     fig.subplots_adjust(
         bottom=0.175, left=0.2, hspace=0.15, wspace=0.25, top=0.925, right=0.95
     )
-    fig.savefig("figures/figure1.png", dpi=300)
-    fig.savefig("figures/figure1.svg", dpi=300)
+    fig.savefig("figures/figure1.jpg", dpi=600)
+    fig.savefig("figures/figure1.svg", dpi=600)

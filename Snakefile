@@ -1,10 +1,10 @@
 rule figure1:
     input: 
-        "figures/figure1.png",
+        "figures/figure1.jpg",
 
 rule figure2:
     input: 
-        "figures/figure2.png",
+        "figures/figure2.jpg",
 
 rule figure3:
     input: 
@@ -383,7 +383,7 @@ rule plot_figure1:
         "results/e_coli.seqdeft.map.csv",
         "results/e_coli.seqdeft.cv_results.csv",
     output:
-        "figures/figure1.png"
+        "figures/figure1.jpg"
     conda: 
         "sd"
     shell:
@@ -401,7 +401,7 @@ rule plot_figure2:
         "results/vcregression.map.site_marginal_epistasis.csv",
         "results/vcregression.map_pairwise_marginal_epistasis.csv",
     output:
-        "figures/figure2.png"
+        "figures/figure2.jpg"
     conda: 
         "sd"
     shell:
