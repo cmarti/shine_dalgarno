@@ -7,6 +7,7 @@ import matplotlib.gridspec as gs
 from itertools import combinations
 from scipy.stats import pearsonr
 from scripts.figures.plot_utils import FIG_WIDTH
+from gpmap.summary import GPmapSummarizer
 
 
 if __name__ == "__main__":
@@ -57,3 +58,20 @@ if __name__ == "__main__":
 
     print('Average percentage of pairwise variance explained by pairs of sites {}: {:.2f}'.format(s1, v1))
     print('Average Percentage of higher order variance explained by pairs of sites {}: {:.2f}'.format(s2, v2))
+
+
+    sd = GPmapSummarizer(n_alleles=4, seq_length=9)
+    fpaths = {'vcregression': "results/vcregression.map.csv",
+              'e_coli': "results/e_coli.seqdeft.map.csv",
+              'b_sub': "results/b_sub.seqdeft.map.csv"}
+
+    for label, fpath in fpaths.items():
+        df = pd.read_csv(fpath, index_col=0)
+        if 'Q_star' in df.columns:
+            df['logQ'] = np.log(df['Q_star'])
+        f = df.iloc[:, -1]
+        e1 = sd.calc_root_mean_squared_epistatic_coeff(P=1, f=f)
+        e2 = sd.calc_root_mean_squared_epistatic_coeff(P=2, f=f)
+        print(f'Dataset: {label}')
+        print('\troot mean squared mutational effect = {:.2f}'.format(e1))
+        print('\troot mean squared epistatic coefficient = {:.2f}'.format(e2))
