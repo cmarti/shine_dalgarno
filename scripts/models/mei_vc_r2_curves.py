@@ -49,7 +49,6 @@ if __name__ == "__main__":
             r2 = np.corrcoef(y_test, y_test_pred)[0, 1] ** 2
             rmse = np.sqrt(np.mean((y_test - y_test_pred) ** 2))
             record = {"p": p, "r2": r2, "rmse": rmse, "model": "MEI"}
-            print(record)
             results.append(record)
 
     results = pd.DataFrame(results)
