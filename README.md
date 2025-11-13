@@ -45,7 +45,7 @@ conda activate snakemake
 
 Snakemake is used to reproduce the analyses. It executes the required scripts in the correct order, automatically creates and activates the conda environments defined in the `Snakefile`, and tracks all intermediate files and dependencies. When you request a specific target (for example, main figures, supplementary figures, or Figure 4), Snakemake determines the minimal set of steps needed and skips any steps whose outputs are already up to date, avoiding redundant computation. Run Snakemake with the --use-conda flag to ensure the required environments are used.
 
-> **Note** that the Snakemake workflow expects the conde environment with the required software to be named `sd`
+> Note that the Snakemake workflow expects the conde environment with the required software to be named `sd`
 
 For running the workflow:
 
@@ -53,7 +53,7 @@ For running the workflow:
 snakemake --snakefile <worflow file> --cores <number of cores> --use-conda <target>
 ```
 
-> **Note** that the <target> must be one of the rules defined in the `Snakefile`. We have defined rules for each figure, for the set of main or supplementary figures and for all figures together. 
+> Note that the target must be one of the rules defined in the `Snakefile`. We have defined rules for each figure, for the set of main or supplementary figures and for all figures together. 
 
 For instance, to run the full workflow specified in the `Snakefile` file with a single core:
 
