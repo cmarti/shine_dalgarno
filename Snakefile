@@ -1,19 +1,19 @@
-rule figure1:
-    input: 
-        "figures/figure1.jpg",
-
 rule figure2:
     input: 
-        "figures/figure2.jpg",
+        "figures/Figure_2.jpg",
 
 rule figure3:
+    input: 
+        "figures/Figure_3.jpg",
+
+rule figure4:
     input: 
         "figures/seqdeft_visualization.svg",
         "figures/seqdeft_vcregression_comparison.svg",
         "figures/vcregression_visualization.svg",
         "figures/mut_eff_posterior.svg",
 
-rule figure4:
+rule figure5:
     input: 
         "figures/thermodynamic_model_params.svg",
         "figures/thermodynamic_model_visualization.svg",
@@ -65,10 +65,10 @@ rule figureS10:
 
 rule main_figures:
     input:
-        rules.figure1.input,
         rules.figure2.input,
         rules.figure3.input,
         rules.figure4.input,
+        rules.figure5.input,
 
 rule supplementary_figures:
     input:
@@ -376,20 +376,20 @@ rule calc_variance_components:
         "source activate.sh ; python scripts/prep_results/calc_map_variance_components.py"
 
 # Making plots
-rule plot_figure1:
+rule plot_figure2:
     input:
         "processed/e_coli.gene_5utr.csv",
         "processed/e_coli.seqs.txt",
         "results/e_coli.seqdeft.map.csv",
         "results/e_coli.seqdeft.cv_results.csv",
     output:
-        "figures/figure1.jpg"
+        "figures/Figure_2.jpg"
     conda: 
         "sd"
     shell:
-        "source activate.sh ; python scripts/figures/figure1/figure1.py"
+        "source activate.sh ; python scripts/figures/figure2/figure2.py"
 
-rule plot_figure2:
+rule plot_figure3:
     input:
         "results/dmsc.empirical_distance_correlation.csv",
         "results/vcregression.variance_components.csv",
@@ -401,11 +401,11 @@ rule plot_figure2:
         "results/vcregression.map.site_marginal_epistasis.csv",
         "results/vcregression.map_pairwise_marginal_epistasis.csv",
     output:
-        "figures/figure2.jpg"
+        "figures/Figure_3.jpg"
     conda: 
         "sd"
     shell:
-        "source activate.sh ; python scripts/figures/figure2/figure2.py"
+        "source activate.sh ; python scripts/figures/figure3/figure3.py"
 
 rule plot_seqdeft_visualization:
     input:
@@ -417,7 +417,7 @@ rule plot_seqdeft_visualization:
     conda: 
         "sd"
     shell:
-        "source activate.sh ; python scripts/figures/figure3/plot_seqdeft_visualization.py"
+        "source activate.sh ; python scripts/figures/figure4/plot_seqdeft_visualization.py"
 
 rule plot_seqdeft_vcregression_comparison:
     input:
@@ -428,7 +428,7 @@ rule plot_seqdeft_vcregression_comparison:
     conda: 
         "sd"
     shell:
-        "source activate.sh ; python scripts/figures/figure3/plot_data_comparison.py"
+        "source activate.sh ; python scripts/figures/figure4/plot_data_comparison.py"
 
 rule plot_vcregression_visualization:
     input:
@@ -439,7 +439,7 @@ rule plot_vcregression_visualization:
     conda: 
         "sd"
     shell:
-        "source activate.sh ; python scripts/figures/figure3/plot_vcregression_visualization.py"
+        "source activate.sh ; python scripts/figures/figure4/plot_vcregression_visualization.py"
 
 rule plot_contrasts:
     input:
@@ -450,7 +450,7 @@ rule plot_contrasts:
     conda: 
         "sd"
     shell:
-        "source activate.sh ; python scripts/figures/figure3/plot_contrasts.py"
+        "source activate.sh ; python scripts/figures/figure4/plot_contrasts.py"
 
 rule plot_td_params:
     input:
@@ -460,7 +460,7 @@ rule plot_td_params:
     conda:
         "sd"
     shell:
-        "source activate.sh ; python scripts/figures/figure4/plot_td_params.py"
+        "source activate.sh ; python scripts/figures/figure5/plot_td_params.py"
 
 rule plot_td_visualization:
     input:
@@ -471,7 +471,7 @@ rule plot_td_visualization:
     conda:
         "sd"
     shell:
-        "source activate.sh ; python scripts/figures/figure4/plot_td_visualization.py"
+        "source activate.sh ; python scripts/figures/figure5/plot_td_visualization.py"
 
 rule plot_td_visualization_energies:
     input:
@@ -482,7 +482,7 @@ rule plot_td_visualization_energies:
     conda:
         "sd"
     shell:
-        "source activate.sh ; python scripts/figures/figure4/plot_td_visualization_energies.py"
+        "source activate.sh ; python scripts/figures/figure5/plot_td_visualization_energies.py"
 
 rule plot_b_sub_contrast:
     input:

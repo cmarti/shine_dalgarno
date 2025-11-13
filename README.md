@@ -43,7 +43,9 @@ conda activate snakemake
 
 ## Reproducing the Results
 
-Once installed, you can run the full workflow with:
+Snakemake is used to reproduce the analyses. It executes the required scripts in the correct order, automatically creates and activates the conda environments defined in the Snakefile, and tracks all intermediate files and dependencies. When you request a specific target (for example, main figures, supplementary figures, or Figure 4), Snakemake determines the minimal set of steps needed and skips any steps whose outputs are already up to date, avoiding redundant computation. Run Snakemake with the --use-conda flag to ensure the required environments are used.
+
+You can run the full workflow with:
 
 ```bash
 snakemake --snakefile Snakefile --cores 1 --use-conda all
@@ -59,7 +61,7 @@ snakemake --snakefile Snakefile --cores 1 --use-conda supplementary_figures
 You can also generate panels for specific figures of interest, for example:
 
 ```bash
-snakemake --snakefile Snakefile --cores 1 --use-conda figure3
+snakemake --snakefile Snakefile --cores 1 --use-conda figure4
 ```
 
 ## Output
