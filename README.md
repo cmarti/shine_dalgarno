@@ -86,4 +86,4 @@ The provided scripts compute all necessary steps from the raw data in the `data`
 
 If you use this repository, please cite:
 
-- C. Marti-Gomez, J. Zhou, W.C. Chen, A. Stoltzfus , J.B. Kinney, D.M. McCandlish. *Inference and visualization of complex genotype-phenotype maps (2026). Molecular Biology and Evolution. [doi](https://doi.org/10.1093/molbev/msag023).
+- C. Marti-Gomez, J. Zhou, W.C. Chen, A. Stoltzfus , J.B. Kinney, D.M. McCandlish. *Inference and visualization of complex genotype-phenotype maps* (2026). Molecular Biology and Evolution. [doi](https://doi.org/10.1093/molbev/msag023).
